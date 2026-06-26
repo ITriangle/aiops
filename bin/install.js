@@ -36,6 +36,9 @@ const VERSION = require("../package.json").version;
 // Resolve the aiops root directory (where agents/ and skills/ live)
 const AIOps_ROOT = path.resolve(__dirname, "..");
 
+// Adapter registry — converts skills to IDE-native formats
+const { getAdapter } = require("../scripts/adapters");
+
 // ─── Color helpers ───────────────────────────────────────────────────────────
 
 const c = {
@@ -95,12 +98,26 @@ const PROVIDERS = [
     id: "codex",
     label: "Codex CLI",
     aliases: ["codex"],
-    detect: () => hasCommand("codex") || hasDir(path.join(HOME, ".codex")),
+    detect: () =>
+      hasCommand("codex") ||
+      hasDir(path.join(HOME, ".codex")) ||
+      hasDir(path.join(HOME, ".agents")),
     globalAgentsDir: path.join(HOME, ".codex", "agents"),
     localAgentsDir: ".codex/agents",
-    globalSkillsDir: path.join(HOME, ".codex", "skills"),
-    localSkillsDir: ".codex/skills",
+    globalSkillsDir: path.join(HOME, ".agents", "skills"),
+    localSkillsDir: ".agents/skills",
     agentFormat: "toml",
+  },
+  {
+    id: "windsurf",
+    label: "Windsurf",
+    aliases: ["windsurf"],
+    detect: () => hasDir(path.join(HOME, ".windsurf")) || hasMacApp("Windsurf"),
+    globalAgentsDir: path.join(HOME, ".windsurf", "agents"),
+    localAgentsDir: ".windsurf/agents",
+    globalSkillsDir: path.join(HOME, ".windsurf", "skills"),
+    localSkillsDir: ".windsurf/skills",
+    agentFormat: "md-yaml",
   },
 ];
 
@@ -307,6 +324,35 @@ function uninstallAgents(provider, agents, isGlobal) {
   }
 }
 
+/**
+ * Install AGENTS.md for providers that use it instead of standalone agent files
+ * (e.g. Codex CLI reads AGENTS.md from project root or ~/.codex/AGENTS.md).
+ */
+function installAgentsMd(provider, isGlobal) {
+  const agentsMdPath = path.join(AIOps_ROOT, "AGENTS.md");
+  if (!fs.existsSync(agentsMdPath)) {
+    skip("no AGENTS.md found (run: node scripts/build/build-agents-md.js)");
+    return;
+  }
+
+  let destPath;
+  if (isGlobal) {
+    // Global: write to provider's config directory
+    if (provider.id === "codex") {
+      destPath = path.join(HOME, ".codex", "AGENTS.md");
+    } else {
+      return; // No global AGENTS.md convention for other providers
+    }
+  } else {
+    // Local: write to project root
+    destPath = path.resolve("AGENTS.md");
+  }
+
+  fs.mkdirSync(path.dirname(destPath), { recursive: true });
+  fs.copyFileSync(agentsMdPath, destPath);
+  ok(`AGENTS.md → ${c.dim(path.dirname(destPath))}`);
+}
+
 function installSkills(provider, isGlobal) {
   const skillsDir = path.join(AIOps_ROOT, "skills");
   if (!hasDir(skillsDir)) {
@@ -320,12 +366,17 @@ function installSkills(provider, isGlobal) {
 
   fs.mkdirSync(destBase, { recursive: true });
 
-  // Read manifest to get tier1 skills
+  // Read manifest to get tier1 skills + alwaysOn metadata
   const manifestPath = path.join(skillsDir, "manifest.json");
   let tier1 = [];
+  let alwaysOnNames = new Set();
   if (fs.existsSync(manifestPath)) {
     const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
     tier1 = (manifest.tier1 || []).map((s) => s.name);
+    // Collect alwaysOn skill names from manifest
+    for (const s of manifest.tier1 || []) {
+      if (s.alwaysOn) alwaysOnNames.add(s.name);
+    }
   } else {
     // Fallback: all subdirectories with SKILL.md
     tier1 = fs.readdirSync(skillsDir).filter((d) => {
@@ -334,14 +385,52 @@ function installSkills(provider, isGlobal) {
     });
   }
 
+  // Get the adapter for this provider (null if no dedicated adapter)
+  const adapter = getAdapter(provider.id);
+
   for (const name of tier1) {
     const srcDir = path.join(skillsDir, name);
     if (!hasDir(srcDir)) continue;
 
+    const skillMdPath = path.join(srcDir, "SKILL.md");
+    const isAlwaysOn = alwaysOnNames.has(name) && fs.existsSync(skillMdPath);
+
+    // ── Always-on skills: compile through adapter if available ──
+    if (isAlwaysOn && adapter && adapter.compileAlwaysOn) {
+      const content = fs.readFileSync(skillMdPath, "utf8");
+
+      // Extract description from frontmatter
+      const descMatch = content.match(/^description:\s*>?\s*([\s\S]*?)(?:\n---|\n[a-z])/m);
+      const description = descMatch
+        ? descMatch[1].replace(/\n\s+/g, " ").trim()
+        : name;
+
+      const skill = { name, content, description };
+      const compiled = adapter.compileAlwaysOn(skill);
+
+      if (adapter.rulesDir) {
+        // Cursor/Windsurf style: write .mdc to rules directory
+        const rulesDir = isGlobal
+          ? adapter.rulesDir.global
+          : path.resolve(adapter.rulesDir.local);
+        fs.mkdirSync(rulesDir, { recursive: true });
+        fs.writeFileSync(path.join(rulesDir, compiled.filename), compiled.content, "utf8");
+        ok(`${name}.mdc (always-on) → ${c.dim(rulesDir)}`);
+      } else if (adapter.instructionsFile) {
+        // Copilot style: write single instructions file
+        const filePath = isGlobal
+          ? adapter.instructionsFile.global
+          : path.resolve(adapter.instructionsFile.local);
+        fs.mkdirSync(path.dirname(filePath), { recursive: true });
+        fs.writeFileSync(filePath, compiled.content, "utf8");
+        ok(`${compiled.filename} (always-on) → ${c.dim(path.dirname(filePath))}`);
+      }
+      continue;
+    }
+
+    // ── Regular skills: copy as-is (existing behavior) ──
     const destDir = path.join(destBase, name);
     fs.mkdirSync(destDir, { recursive: true });
-
-    // Copy all files in skill directory
     copyDirSync(srcDir, destDir);
     ok(`${name}/ → ${c.dim(destDir)}`);
   }
@@ -446,6 +535,8 @@ function main() {
         installAgents(provider, agents, args.global);
         totalInstalled += agents.length;
       }
+      // Also install AGENTS.md as a supplement (protocol file for generic harnesses)
+      installAgentsMd(provider, args.global);
     }
 
     log("");

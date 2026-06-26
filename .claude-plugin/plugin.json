@@ -4,5 +4,7 @@
   "version": "1.3.0",
   "author": {
     "name": "yugasun"
-  }
+  },
+  "hooks": "./hooks/claude-codex-hooks.json",
+  "skills": "./skills/"
 }

@@ -21,7 +21,9 @@ venv/
 # Scratch work (optional — keep if you want issues tracked in-repo)
 .scratch/
 .agents/
+.codex/agents/
 
 CONTEXT.md
 docs/adr/
 docs/agents/
+docs/superpowers/

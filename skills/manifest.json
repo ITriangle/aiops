@@ -5,7 +5,7 @@
     { "name": "aiops", "personal": true, "role": "router" },
     { "name": "aiops-implement", "personal": true, "role": "delivery" },
     { "name": "aiops-setup", "personal": true, "role": "setup" },
-    { "name": "lean", "personal": false, "role": "discipline" },
+    { "name": "lean", "personal": false, "role": "discipline", "alwaysOn": true },
     { "name": "prune", "personal": false, "role": "delivery-gate" },
     { "name": "grill-with-docs", "personal": false, "role": "alignment" },
     { "name": "grilling", "personal": false, "role": "alignment" },
@@ -19,13 +19,10 @@
     { "name": "prototype", "personal": false, "role": "prototype" },
     { "name": "review", "personal": false, "role": "delivery-gate" },
     { "name": "gitops", "personal": true, "role": "delivery" },
-    { "name": "ui-mockup", "personal": false, "role": "design" }
+    { "name": "ui-mockup", "personal": false, "role": "design" },
+    { "name": "improve-codebase-architecture", "personal": false, "role": "architecture-health" }
   ],
   "tier2Deferred": [
-    {
-      "name": "improve-codebase-architecture",
-      "handoff": "Use /aiops with Architecture health, or /grill-with-docs for a single deepening item."
-    },
     {
       "name": "codebase-design",
       "handoff": "Deferred; use /domain-modeling and /grill-with-docs for design vocabulary until forked."

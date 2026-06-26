@@ -9,7 +9,6 @@
 
    ```bash
    bash scripts/verify.sh           # fast, no npm
-   bash scripts/smoke-install.sh    # full install smoke + router tests
    ```
 
 5. Router changes: `scripts/lib/router.py` + `scripts/test_router.py`.

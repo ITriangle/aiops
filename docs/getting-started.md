@@ -160,7 +160,6 @@ Process issues; when one is `ready-for-agent`, start a new session with **`/aiop
 | Claude Plugin: command not found | Use `/aiops:aiops` or install via Skills CLI for `/aiops` |
 | Skills mention missing `docs/agents/` | Run `/aiops-setup` in the target project |
 | Wrong skill cited | See [`skill-registry.md`](agents/skill-registry.md) |
-| Maintainer smoke fails | `bash scripts/smoke-install.sh` from aiops repo root (needs Node) |
 
 ## Next steps
 

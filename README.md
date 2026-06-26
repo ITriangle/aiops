@@ -1,25 +1,89 @@
 # aiops
 
-Personal agent skills bundle for AI-assisted software development — grill, plan, implement, and ship with hard quality gates.
+[中文文档](README.zh-CN.md)
 
-Install once globally, use in any codebase. Entry skill: `/aiops`.
+Personal agent skills bundle for AI-assisted software development — grill, plan, implement, and ship with hard quality gates. Install once, use in any codebase across **6 AI IDEs**.
+
+Entry skill: `/aiops`.
+
+## Key features
+
+- **19 skills** covering the full dev lifecycle: alignment → planning → delivery → review → ship
+- **8 specialized agents** with artifact contracts and dispatch sequences
+- **Always-on lean discipline** — YAGNI ladder auto-injected into every coding turn (Cursor `.mdc`, Copilot instructions, Windsurf `.mdc`)
+- **Multi-IDE portability** — one source of truth (`SKILL.md`), adapter seam compiles to each IDE's native format
+- **Lifecycle hooks** — SessionStart/SubagentStart injection for Claude Code and Codex
+- **AGENTS.md generation** — project-level agent protocol file for any compatible harness
+
+## Quick start
+
+```bash
+# Install to all detected AI IDEs (project-local, default)
+npx -y github:yugasun/aiops
+
+# Or via curl
+curl -fsSL https://raw.githubusercontent.com/yugasun/aiops/main/install.sh | bash
+```
+
+### CLI options
+
+```bash
+# Target a specific IDE
+npx -y github:yugasun/aiops --ide cursor
+npx -y github:yugasun/aiops --ide claude
+npx -y github:yugasun/aiops --ide codex
+npx -y github:yugasun/aiops --ide copilot
+npx -y github:yugasun/aiops --ide windsurf
+
+# Global install (to ~/)
+npx -y github:yugasun/aiops -g
+
+# Selective install
+npx -y github:yugasun/aiops --skills-only
+npx -y github:yugasun/aiops --agents-only
+
+# List detected IDEs without installing
+npx -y github:yugasun/aiops --list
+
+# Uninstall
+npx -y github:yugasun/aiops --uninstall
+```
+
+### Claude Code Plugin (alternate)
+
+```
+/plugin marketplace add yugasun/aiops
+/plugin install aiops@aiops
+```
+
+## Supported IDEs
+
+| IDE | Skills Path | Always-On | Agents | Hooks |
+| --- | --- | --- | --- | --- |
+| **Claude Code** | `.claude/skills/` | via `/lean` trigger | `.claude/agents/*.md` | SessionStart + SubagentStart |
+| **Cursor** | `.cursor/skills/` | `.cursor/rules/lean.mdc` | `.cursor/agents/*.md` | — |
+| **Codex CLI** | `.agents/skills/` | via `AGENTS.md` | `.codex/agents/*.toml` | — |
+| **Windsurf** | `.windsurf/skills/` | `.windsurf/rules/lean.mdc` | `.windsurf/agents/*.md` | — |
+| **GitHub Copilot** | `.github/skills/` | `.github/copilot-instructions.md` | `.github/agents/*.md` | — |
+| **Generic harness** | — | `AGENTS.md` (project root) | — | — |
 
 ## What you get
+
+### Skills (19 Tier 1)
 
 | Layer | Skills |
 | --- | --- |
 | **Router** | `/aiops` — pick task type and flow |
-| **Setup** | `/aiops-setup` — issue tracker, triage labels, domain docs (per project) |
+| **Setup** | `/aiops-setup` — issue tracker, triage labels, domain docs |
 | **Alignment** | `/grill-with-docs`, `/grilling`, `/domain-modeling` |
 | **Planning** | `/to-prd`, `/to-issues`, `/handoff`, `/prototype` |
 | **Delivery** | `/aiops-implement` → `/lean` → `/tdd` → `/prune` → `/review` |
-| **Other paths** | `/diagnosing-bugs`, `/triage` |
+| **Architecture** | `/improve-codebase-architecture` — scan for deepening opportunities |
+| **Other paths** | `/diagnosing-bugs`, `/triage`, `/ui-mockup`, `/gitops` |
 
-18 Tier 1 skills. Full list: [`skills/manifest.json`](skills/manifest.json) and [`docs/skill-registry.md`](docs/skill-registry.md).
+Full list: [`skills/manifest.json`](skills/manifest.json)
 
-## Agents
-
-8 specialized agents that wrap skills with identity, constraints, and artifact contracts:
+### Agents (8)
 
 | Agent | Role | Key Output |
 | --- | --- | --- |
@@ -32,107 +96,97 @@ Install once globally, use in any codebase. Entry skill: `/aiops`.
 | `quality-auditor` | YAGNI check | prune findings |
 | `gitops` | Git operations | commit + push |
 
-Usage:
+### Lean discipline (always-on)
+
+The YAGNI ladder is auto-injected into every coding turn for supported IDEs:
+
 ```
-/aiops <task>                # Router auto-dispatches agents
-/aiops architect <task>      # Direct agent invocation
+1. Does this need to exist? (YAGNI)
+2. Stdlib does it?
+3. Native platform feature?
+4. Already-installed dependency?
+5. One line?
+6. Minimum code that works
 ```
 
-See [agent-registry.md](docs/agent-registry.md) for dispatch sequences and artifact contracts.
+Delivery sequence: **lean → TDD → prune → review → commit** (only on user approval).
 
-## Quick start
+## Architecture
 
-### One-line install (recommended)
+```
+                    ┌─── build scripts ──→ .cursor/rules/lean.mdc
+                    │                      .github/copilot-instructions.md
+                    │                      .windsurf/rules/lean.mdc
+                    │                      AGENTS.md
+                    │
+skills/lean/SKILL.md ─── install time ──→ Cursor: .cursor/rules/lean.mdc (always-on)
+                    │                     Copilot: .github/copilot-instructions.md
+                    │                     Windsurf: .windsurf/rules/lean.mdc
+                    │                     Claude/Codex: skills dir (copy)
+                    │
+                    └─── hooks ──────────→ SessionStart: lean ladder in context
+                                           SubagentStart: compact lean reminder
+```
+
+**Adapter seam** (`scripts/adapters/`) converts `SKILL.md` to IDE-native formats at install time. Adding a new IDE = writing one adapter file.
+
+**Build scripts** (`scripts/build/`) pre-generate artifacts for repo-committed output:
 
 ```bash
-# Install skills + agents to all detected AI IDEs
-npx -y github:yugasun/aiops
-
-# Or via curl
-curl -fsSL https://raw.githubusercontent.com/yugasun/aiops/main/install.sh | bash
+node scripts/build/build-all.js    # Generate all IDE-native artifacts
 ```
 
-### CLI options
-
-```bash
-# Install to a specific IDE
-npx -y github:yugasun/aiops --ide cursor
-npx -y github:yugasun/aiops --ide claude-code
-
-# Only install agents (skip skills)
-npx -y github:yugasun/aiops --agents-only
-
-# Only install skills (skip agents)
-npx -y github:yugasun/aiops --skills-only
-
-# List detected IDEs without installing
-npx -y github:yugasun/aiops --list
-
-# Project-local install (to .claude/, .cursor/, etc.)
-npx -y github:yugasun/aiops --local
-
-# Uninstall agents
-npx -y github:yugasun/aiops --uninstall
-```
-
-### Supported IDEs
-
-| IDE | Install Path | Format |
-| --- | --- | --- |
-| Claude Code | `~/.claude/agents/` | Markdown + YAML |
-| Cursor | `~/.cursor/agents/` | Markdown + YAML |
-| GitHub Copilot | `~/.github/agents/` | Markdown + YAML |
-| Codex CLI | `~/.codex/agents/` | TOML |
-
-### Claude Code Plugin (alternate)
+## Project layout
 
 ```
-/plugin marketplace add yugasun/aiops
-/plugin install aiops@aiops
+aiops/
+├── README.md                     # English (default)
+├── README.zh-CN.md               # 中文
+├── AGENTS.md                     # Generated agent protocol file
+├── CONTEXT.md                    # Domain vocabulary
+├── package.json                  # CLI entry (npx -y github:yugasun/aiops)
+├── install.sh                    # curl | bash bootstrap
+├── bin/
+│   └── install.js                # Main installer with adapter seam
+├── agents/                       # Agent definitions (source of truth)
+├── skills/                       # Skill definitions (source of truth)
+│   ├── manifest.json             # Tier 1 registry (19 skills)
+│   └── <skill-name>/SKILL.md
+├── hooks/                        # Lifecycle hooks
+│   ├── aiops-activate.js         # SessionStart: inject lean + delivery sequence
+│   ├── aiops-subagent.js         # SubagentStart: compact lean reminder
+│   └── claude-codex-hooks.json   # Hook configuration
+├── scripts/
+│   ├── adapters/                 # IDE format adapters
+│   │   ├── cursor.js             # SKILL.md → .mdc (alwaysApply: true)
+│   │   ├── copilot.js            # SKILL.md → copilot-instructions.md
+│   │   ├── windsurf.js           # SKILL.md → .mdc
+│   │   └── index.js              # Adapter registry
+│   └── build/                    # Pre-build scripts for artifacts
+│       ├── build-all.js          # Master build (runs all)
+│       ├── build-agents-md.js    # → AGENTS.md
+│       ├── build-cursor-rules.js # → .cursor/rules/lean.mdc
+│       ├── build-copilot-instructions.js
+│       └── build-windsurf-rules.js
+├── .claude-plugin/               # Claude Code plugin manifest
+└── docs/
+    ├── getting-started.md
+    ├── agent-registry.md
+    └── skill-registry.md
 ```
 
-Plugin skills use the `aiops:` namespace (e.g. `/aiops:aiops`).
-
-Then in **any target project**:
+## In a target project
 
 1. Run `/aiops-setup` once (issue tracker, labels, `CONTEXT.md` layout).
 2. Run `/aiops` for every new task.
 
 Details: **[docs/getting-started.md](docs/getting-started.md)**.
 
-## Project layout
-
-```
-aiops/
-├── README.md
-├── package.json              # CLI entry (npx -y github:yugasun/aiops)
-├── install.sh                # curl | bash bootstrap
-├── bin/
-│   └── install.js            # Main installer (detects IDEs, installs all)
-├── agents/                   # Agent definitions (source of truth)
-│   └── <agent-name>.md
-├── .claude-plugin/           # Claude Code marketplace + plugin manifest
-├── skills/                   # Bundle source (Skills CLI discovers this)
-│   ├── manifest.json
-│   └── <skill-name>/SKILL.md
-├── docs/
-│   ├── getting-started.md
-│   ├── agent-registry.md
-│   ├── skill-registry.md
-│   └── superpowers/specs/
-└── scripts/
-    ├── install-agents.sh     # Standalone agent installer (bash)
-    ├── smoke-install.sh      # CI: npx skills install + router tests
-    └── verify.sh             # bundle + plugin + skill-ref checks
-```
-
-**Source of truth:** `agents/` for agents, `skills/` for skills.
-
 ## Verify (maintainers)
 
 ```bash
 bash scripts/verify.sh          # source checks (skills + agents)
-bash scripts/smoke-install.sh   # full CI (needs Node.js)
+node scripts/build/build-all.js # generate IDE-native artifacts
 ```
 
 ## Docs
@@ -142,7 +196,6 @@ bash scripts/smoke-install.sh   # full CI (needs Node.js)
 - [Skill registry](docs/skill-registry.md) — install paths + allowed references
 - [CONTEXT.md](CONTEXT.md) — vocabulary for the bundle
 - [Design spec](docs/superpowers/specs/2026-06-26-agents-team-design.md) — agents team architecture
-- [ADR index](docs/adr/) — design history
 
 ## License
 
