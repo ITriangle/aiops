@@ -12,8 +12,8 @@ Implement work from a PRD or issue brief. **Not** for grill/alignment — lean i
 
 1. **Lean ladder** — write minimal code (stdlib/native first)
 2. **`/tdd`** — red-green-refactor at agreed public interfaces (user may exempt mechanical fixes)
-3. **`/prune`** — remove over-engineering from the diff
-4. **`/review`** — standards + spec review
+3. **`/review`** — standards + spec review (code-reviewer checks correctness and design alignment)
+4. **`/prune`** — remove over-engineering from the diff (quality-auditor runs only after review APPROVE)
 5. **Commit** — **only when the user explicitly asks**. Never commit autonomously.
 
 Run typechecking and targeted tests during implementation; full suite once at the end.

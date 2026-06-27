@@ -20,7 +20,8 @@
     { "name": "review", "personal": false, "role": "delivery-gate" },
     { "name": "gitops", "personal": true, "role": "delivery" },
     { "name": "ui-mockup", "personal": false, "role": "design" },
-    { "name": "improve-codebase-architecture", "personal": false, "role": "architecture-health" }
+    { "name": "improve-codebase-architecture", "personal": false, "role": "architecture-health" },
+    { "name": "architect-design", "personal": false, "role": "alignment" }
   ],
   "tier2Deferred": [
     {
@@ -39,9 +40,15 @@
   "agents": [
     {
       "name": "architect",
-      "skills": ["grilling", "grill-with-docs", "domain-modeling"],
+      "skills": ["grilling", "grill-with-docs", "domain-modeling", "architect-design", "improve-codebase-architecture"],
       "role": "alignment",
       "outputs": [".scratch/<feature>/NOTES.md", ".scratch/<feature>/tech-spec.md"]
+    },
+    {
+      "name": "design-reviewer",
+      "skills": ["review"],
+      "role": "design-gate",
+      "outputs": [".scratch/<feature>/DESIGN_REVIEW.md"]
     },
     {
       "name": "planner",

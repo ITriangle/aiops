@@ -8,8 +8,8 @@
 
 ## 核心特性
 
-- **19 个 skills** 覆盖完整开发生命周期：对齐 → 规划 → 交付 → 评审 → 发布
-- **8 个专业 agents** 带制品契约和调度序列
+- **20 个 skills** 覆盖完整开发生命周期：对齐 → 设计评审 → 规划 → 交付 → 评审 → 发布
+- **9 个专业 agents** 带制品契约和调度序列
 - **始终生效的 lean 纪律** —— YAGNI ladder 自动注入每次编码 turn（Cursor `.mdc`、Copilot instructions、Windsurf `.mdc`）
 - **多 IDE 可移植** —— 单一 source of truth（`SKILL.md`），adapter seam 编译为各 IDE 原生格式
 - **生命周期 hooks** —— SessionStart/SubagentStart 注入，覆盖 Claude Code 和 Codex
@@ -69,25 +69,26 @@ npx -y github:yugasun/aiops --uninstall
 
 ## 功能清单
 
-### Skills（19 个 Tier 1）
+### Skills（20 个 Tier 1）
 
 | 层 | Skills |
 | --- | --- |
 | **路由** | `/aiops` — 选择任务类型和流程 |
 | **设置** | `/aiops-setup` — issue 跟踪、triage 标签、领域文档 |
-| **对齐** | `/grill-with-docs`、`/grilling`、`/domain-modeling` |
+| **对齐** | `/grill-with-docs`、`/grilling`、`/domain-modeling`、`/architect-design` |
 | **规划** | `/to-prd`、`/to-issues`、`/handoff`、`/prototype` |
-| **交付** | `/aiops-implement` → `/lean` → `/tdd` → `/prune` → `/review` |
+| **交付** | `/aiops-implement` → `/lean` → `/tdd` → `/review` → `/prune` |
 | **架构** | `/improve-codebase-architecture` — 扫描深化机会 |
 | **其他** | `/diagnosing-bugs`、`/triage`、`/ui-mockup`、`/gitops` |
 
 完整列表：[`skills/manifest.json`](skills/manifest.json)
 
-### Agents（8 个）
+### Agents（9 个）
 
 | Agent | 角色 | 核心输出 |
 | --- | --- | --- |
 | `architect` | 设计决策 + 技术规格 | NOTES.md, tech-spec.md |
+| `design-reviewer` | 设计评审门控 | DESIGN_REVIEW.md |
 | `planner` | 任务拆解 + 计划 | PRD.md, plan.md, issues/ |
 | `prototyper` | 快速验证 | VERDICT.md, prototype/ |
 | `builder` | TDD 实现 | 源码 + 测试 |
@@ -109,7 +110,7 @@ YAGNI ladder 在支持的 IDE 中自动注入每次编码 turn：
 6. 能工作的最少代码
 ```
 
-交付序列：**lean → TDD → prune → review → commit**（仅在用户确认后提交）。
+交付序列：**lean → TDD → review → prune → commit**（仅在用户确认后提交）。
 
 ## 架构
 

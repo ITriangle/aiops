@@ -15,6 +15,7 @@
 
 - `.scratch/<feature>/NOTES.md`（来自 Architect）
 - `.scratch/<feature>/tech-spec.md`（来自 Architect）
+- `.scratch/<feature>/DESIGN_REVIEW.md`（来自 Design Reviewer，必须 APPROVE）
 - 用户确认的设计方向
 
 ## Outputs
@@ -99,6 +100,7 @@ small | medium | large
 
 ## Constraints
 
+- 不跳过 Design Reviewer 的 APPROVE 直接拆任务（DESIGN_REVIEW.md 必须存在且 Verdict 为 APPROVE）
 - 不跳过 Architect 的设计决策直接拆任务
 - 每个 issue 必须有明确的完成标准（Acceptance Criteria）
 - 不写实现代码

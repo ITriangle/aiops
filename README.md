@@ -8,8 +8,8 @@ Entry skill: `/aiops`.
 
 ## Key features
 
-- **19 skills** covering the full dev lifecycle: alignment → planning → delivery → review → ship
-- **8 specialized agents** with artifact contracts and dispatch sequences
+- **20 skills** covering the full dev lifecycle: alignment → design review → planning → delivery → review → ship
+- **9 specialized agents** with artifact contracts and dispatch sequences
 - **Always-on lean discipline** — YAGNI ladder auto-injected into every coding turn (Cursor `.mdc`, Copilot instructions, Windsurf `.mdc`)
 - **Multi-IDE portability** — one source of truth (`SKILL.md`), adapter seam compiles to each IDE's native format
 - **Lifecycle hooks** — SessionStart/SubagentStart injection for Claude Code and Codex
@@ -69,25 +69,26 @@ npx -y github:yugasun/aiops --uninstall
 
 ## What you get
 
-### Skills (19 Tier 1)
+### Skills (20 Tier 1)
 
 | Layer | Skills |
 | --- | --- |
 | **Router** | `/aiops` — pick task type and flow |
 | **Setup** | `/aiops-setup` — issue tracker, triage labels, domain docs |
-| **Alignment** | `/grill-with-docs`, `/grilling`, `/domain-modeling` |
+| **Alignment** | `/grill-with-docs`, `/grilling`, `/domain-modeling`, `/architect-design` |
 | **Planning** | `/to-prd`, `/to-issues`, `/handoff`, `/prototype` |
-| **Delivery** | `/aiops-implement` → `/lean` → `/tdd` → `/prune` → `/review` |
+| **Delivery** | `/aiops-implement` → `/lean` → `/tdd` → `/review` → `/prune` |
 | **Architecture** | `/improve-codebase-architecture` — scan for deepening opportunities |
 | **Other paths** | `/diagnosing-bugs`, `/triage`, `/ui-mockup`, `/gitops` |
 
 Full list: [`skills/manifest.json`](skills/manifest.json)
 
-### Agents (8)
+### Agents (9)
 
 | Agent | Role | Key Output |
 | --- | --- | --- |
 | `architect` | Design decisions + tech-spec | NOTES.md, tech-spec.md |
+| `design-reviewer` | Design review gate | DESIGN_REVIEW.md |
 | `planner` | Task breakdown + plan | PRD.md, plan.md, issues/ |
 | `prototyper` | Rapid validation | VERDICT.md, prototype/ |
 | `builder` | TDD implementation | source code + tests |
@@ -109,7 +110,7 @@ The YAGNI ladder is auto-injected into every coding turn for supported IDEs:
 6. Minimum code that works
 ```
 
-Delivery sequence: **lean → TDD → prune → review → commit** (only on user approval).
+Delivery sequence: **lean → TDD → review → prune → commit** (only on user approval).
 
 ## Architecture
 

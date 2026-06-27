@@ -22,7 +22,7 @@ From [`skills/manifest.json`](../../skills/manifest.json) — invoke as `/skill-
 | `/aiops-implement` | Delivery overlay |
 | `/aiops-setup` | Per-project tracker + domain config |
 | `/lean` | Minimal-code ladder (delivery only) |
-| `/prune` | Over-engineering gate before review |
+| `/prune` | Over-engineering gate after review |
 | `/grill-with-docs` | Alignment with CONTEXT + ADRs |
 | `/grilling` | Interview loop |
 | `/domain-modeling` | Glossary + ADR discipline |
@@ -36,6 +36,8 @@ From [`skills/manifest.json`](../../skills/manifest.json) — invoke as `/skill-
 | `/review` | Standards + spec review |
 | `/gitops` | Git operations: sync, commit, push |
 | `/ui-mockup` | HTML/CSS mockup generation |
+| `/improve-codebase-architecture` | Architecture health scan + deepening opportunities |
+| `/architect-design` | Structured design process for architect agent |
 
 ## Tier 2 deferred (not installed)
 
@@ -43,7 +45,6 @@ Listed in `manifest.json` → `tier2Deferred`. Do **not** invoke these from bund
 
 | Name | Handoff |
 | --- | --- |
-| `improve-codebase-architecture` | `/aiops` → Architecture health, or `/grill-with-docs` for one item |
 | `codebase-design` | `/domain-modeling` + `/grill-with-docs` until forked |
 | `writing-great-skills` | CONTEXT.md authoring principles + new-skill checklist in `/aiops` |
 | `teach` | Not part of the engineering bundle |
@@ -54,7 +55,8 @@ Agents wrap skills with specialized identity and constraints. See [agent-registr
 
 | Agent | Skills |
 | --- | --- |
-| `architect` | grilling, grill-with-docs, domain-modeling |
+| `architect` | grilling, grill-with-docs, domain-modeling, architect-design, improve-codebase-architecture |
+| `design-reviewer` | review |
 | `planner` | to-prd, to-issues, handoff, aiops-setup |
 | `prototyper` | prototype, lean |
 | `builder` | aiops-implement, tdd, lean |

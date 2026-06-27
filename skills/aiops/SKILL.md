@@ -15,7 +15,7 @@ Single entry for the bundle. Routes tasks through specialized **agents**.
 /aiops <agent-name> <task description> # Direct agent invocation
 ```
 
-Direct agent names: `architect`, `planner`, `prototyper`, `builder`, `ui-designer`, `code-reviewer`, `quality-auditor`, `gitops`
+Direct agent names: `architect`, `design-reviewer`, `planner`, `prototyper`, `builder`, `ui-designer`, `code-reviewer`, `quality-auditor`, `gitops`
 
 ## How to route
 
@@ -29,12 +29,12 @@ Direct agent names: `architect`, `planner`, `prototyper`, `builder`, `ui-designe
 
 | Task type | Agent sequence |
 |-----------|---------------|
-| **Feature** | architect → planner → builder → code-reviewer → quality-auditor → gitops |
-| **Feature + UI** | architect → ui-designer → planner → builder → code-reviewer → quality-auditor → gitops |
+| **Feature** | architect → design-reviewer → planner → builder → code-reviewer → quality-auditor → gitops |
+| **Feature + UI** | architect → ui-designer → design-reviewer → planner → builder → code-reviewer → quality-auditor → gitops |
 | **Bug** | builder → code-reviewer → gitops |
 | **Incoming** | router triage → builder → code-reviewer → gitops |
 | **Prototype** | prototyper |
-| **Architecture health** | architect → builder → code-reviewer → gitops |
+| **Architecture health** | architect → design-reviewer → planner → builder → code-reviewer → quality-auditor → gitops |
 
 ## Agent dispatch protocol
 
@@ -51,6 +51,7 @@ Router generates a kebab-case slug from the task description (e.g. "做一个用
 ## Conditional gates
 
 - **Grill**: Feature, Architecture health, New personal skill; Incoming only if still unclear after triage
+- **Design review**: Feature, Feature + UI, Architecture health (DESIGN_REVIEW.md APPROVE required before planner)
 - **Prototype verdict**: if Prototyper ran (Tier 2), require `VERDICT.md` before Planner or Builder
 
 Lean is **not** active during grill/alignment.

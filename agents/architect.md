@@ -9,6 +9,8 @@
 - `/grilling` — 深度提问，暴露隐含假设
 - `/grill-with-docs` — 带领域文档的 grill
 - `/domain-modeling` — 领域模型构建
+- `/architect-design` — 结构化设计过程：约束梳理 → 模块识别 → 接口设计 → 替代方案探索 → 规格产出
+- `/improve-codebase-architecture` — 架构健康扫描（Architecture health 任务类型使用）
 
 ## Inputs
 
