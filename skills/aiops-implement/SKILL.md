@@ -1,27 +1,43 @@
 ---
 name: aiops-implement
-description: Delivery overlay for the aiops bundle. Implements PRD or issues with lean ladder, tdd, prune, review; commits only on user approval.
+description: Delivery overlay — orchestrates lean ladder, tdd, prune, review with sub-phase gates; commits only on user approval.
 disable-model-invocation: true
 ---
 
 # aiops-implement
 
-Implement work from a PRD or issue brief. **Not** for grill/alignment — lean is active here only while writing code.
+Implement from PRD, issue brief, or tech-spec. **Not** for grill/alignment — lean active only while writing code.
 
-## Delivery sequence (hard gates)
+Invoked by Flow Conductor **delivery** phase (`builder` agent). Update `flow.state.yaml` → `delivery_sub_phase` as you progress.
 
-1. **Lean ladder** — write minimal code (stdlib/native first)
-2. **`/tdd`** — red-green-refactor at agreed public interfaces (user may exempt mechanical fixes)
-3. **`/review`** — standards + spec review (code-reviewer checks correctness and design alignment)
-4. **`/prune`** — remove over-engineering from the diff (quality-auditor runs only after review APPROVE)
-5. **Commit** — **only when the user explicitly asks**. Never commit autonomously.
+## Preconditions
 
-Run typechecking and targeted tests during implementation; full suite once at the end.
+- Issue brief or `issues/<current>` AC, or `tech-spec.md` + `NOTES.md`
+- `DESIGN_REVIEW.md` APPROVE when design review ran in this flow
+- If `/prototype` ran: `VERDICT.md` before absorbing prototype learnings
 
-## Prototype verdict (conditional)
+## Orchestration (hard gates — fixed order)
 
-If this work absorbed a `/prototype`, require `NOTES.md` with the verdict before merging prototype learnings into code or PRD.
+Run sub-phases in order. Do not skip unless user explicitly exempts a step (e.g. mechanical fix → skip new tests).
+
+| Sub-phase | `delivery_sub_phase` | Who | Skill / action | Gate to advance |
+| --- | --- | --- | --- | --- |
+| 1 | `implement` | builder | lean ladder + write code | Tests for changed behaviour pass |
+| 2 | `implement` | builder | `/tdd` at public interfaces | Red-green on agreed surface |
+| 3 | `prune` | quality-auditor | `/prune` on diff | Findings listed or "Lean already" |
+| 4 | `review` | code-reviewer | `/review` vs NOTES/tech-spec/issue | `REVIEW.md` APPROVE |
+| 5 | `ready_for_commit` | — | Set journey gate `ready_for_commit` | User may ask gitops to ship |
+
+Record in journey `gates_satisfied`: `prune_done`, `review_approve`, `ready_for_commit`.
+
+**Commit** — only when user explicitly asks. Never commit autonomously. Shipping is `/gitops` in conductor **ship** phase.
+
+Run typechecking and targeted tests during implement; full suite once before `review`.
+
+## Narration (when conductor shows novice text)
+
+Sub-phase 1–2: 「写代码 + 测试」→ sub-phase 3: 「精简 diff」→ sub-phase 4: 「对照设计评审」→ sub-phase 5: 「等你确认再提交」.
 
 ## Lean off during grill
 
-Alignment phases use `/grill-with-docs` without lean. Switch to lean when implementation starts.
+Alignment uses `/grill-with-docs` without lean. Switch to lean when sub-phase `implement` starts.

@@ -468,7 +468,7 @@ function main() {
 
   if (detected.length === 0) {
     log(c.red("No supported AI IDEs detected."));
-    log("Supported: Claude Code, Cursor, GitHub Copilot, Codex CLI");
+    log("Supported: Claude Code, Cursor, GitHub Copilot, Codex CLI, Windsurf");
     log(`Use ${c.cyan("--ide <name>")} to force install to a specific IDE.`);
     process.exit(1);
   }
@@ -544,8 +544,13 @@ function main() {
 
   if (args.uninstall) {
     log(c.green(`Uninstall complete for ${targets.length} IDE(s).`));
+    log(c.dim("Note: skills directories are not removed by --uninstall; delete .cursor/skills/aiops etc. manually if needed."));
   } else {
     log(c.green(`Done: ${totalInstalled} item(s) installed to ${targets.length} IDE(s).`));
+    log("");
+    log(c.bold("Next:") + " Open your project, restart the IDE, then chat:");
+    log(c.cyan("  /aiops <用中文描述你想做什么>"));
+    log(c.dim("  Resume: /aiops 继续  ·  Docs: github.com/yugasun/aiops"));
   }
 
   if (totalErrors > 0) {

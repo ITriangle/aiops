@@ -1,74 +1,70 @@
 ---
 name: aiops
-description: Entry router for the aiops skills bundle. Picks task type, dispatches agents, enforces setup gate, routes to the next skill in the flow.
+description: Flow Conductor for the aiops bundle. One entry — infers task type, shows plain-language steps, tracks journey in flow.state.yaml, dispatches skill + agent per phase.
 disable-model-invocation: true
 ---
 
-# aiops
+# aiops — Flow Conductor
 
-Single entry for the bundle. Routes tasks through specialized **agents**.
+Single entry for the bundle. Ordinary users only need this command; experts can still `/aiops <agent> …`.
 
 ## Invocation
 
 ```
-/aiops <task description>              # Router auto-dispatches agents
-/aiops <agent-name> <task description> # Direct agent invocation
+/aiops <what you want>           # Conductor — infer, narrate, dispatch
+/aiops 继续 / resume             # Resume from .scratch/<slug>/flow.state.yaml
+/aiops <agent-name> <task>       # Expert — direct agent; still update journey if in a flow
 ```
 
-Direct agent names: `architect`, `design-reviewer`, `planner`, `prototyper`, `builder`, `ui-designer`, `code-reviewer`, `quality-auditor`, `gitops`
+Agents: `architect`, `design-reviewer`, `planner`, `prototyper`, `builder`, `ui-designer`, `code-reviewer`, `quality-auditor`, `gitops`
 
-## How to route
+## Conductor loop (every turn)
 
-1. **Parse invocation**: If `<agent-name>` is specified, dispatch directly to that agent (load `agents/<name>.md`). Otherwise continue.
-2. Identify **Task type** (Feature, Bug, Incoming, Architecture health, New personal skill).
-3. If `docs/agents/` is missing in the target project → run `/aiops-setup` first.
-4. Dispatch agents per the task type sequence below.
-5. **Delivery hard gates** (lean → tdd → prune → review → user-approved commit) live entirely inside `/aiops-implement` — do not interleave them from this router.
+1. **Resume or start** — Read `.scratch/<slug>/flow.state.yaml` if user resumes or slug known. Else infer slug (kebab-case from description; user may override). See [journey.md](journey.md).
+2. **Bootstrap** — If `docs/agents/` missing, run **bootstrap** inline:
+   - No `aiops.yaml` → silent defaults: local markdown issues + 1:1 triage labels ([aiops-setup/aiops-yaml.md](../aiops-setup/aiops-yaml.md)).
+   - `aiops.yaml` with `issue_tracker.kind: github|gitlab` → seed GitHub/GitLab tracker docs from yaml; do not prompt for tracker unless yaml incomplete.
+   - Do not ask user to run another command.
+3. **Plan** — Build `FlowState` from journey + repo signals (see [journey.md](journey.md)). **Default `delivery_mode: single_session`** unless user confirms multi or heuristics clearly warrant multi. Canonical phase list: maintainer runs `python3 scripts/lib/flow_cli.py` in the aiops repo.
+4. **Narrate** — One block from [narration.md](narration.md): **Chinese** `title_zh`, `body_zh`, `artifact_zh`; English only in `title_en`. Hide skill/agent names unless user asks.
+5. **Dispatch** — Load `agents/<agent>.md` when `agent` set; invoke `skill` for the phase. Gather `.scratch/<slug>/` inputs per agent Inputs.
+6. **Gate** — Before advancing: check gate artifacts (journey.md table). Record `gates_satisfied`.
+7. **Advance** — Update `flow.state.yaml` (`current_phase_id`, `phases_done`). On handoff, update journey **before** temp handoff doc.
+8. **Delivery** — When phase is `delivery`, hand off to `/aiops-implement` (owns lean → tdd → prune → review). Do not interleave those gates from the conductor.
 
-## Agent dispatch sequences
+## Task types → phase tail (after bootstrap if needed)
 
-| Task type | Agent sequence |
-|-----------|---------------|
-| **Feature** | architect → design-reviewer → planner → builder → code-reviewer → quality-auditor → gitops |
-| **Feature + UI** | architect → ui-designer → design-reviewer → planner → builder → code-reviewer → quality-auditor → gitops |
-| **Bug** | builder → code-reviewer → gitops |
-| **Incoming** | router triage → builder → code-reviewer → gitops |
-| **Prototype** | prototyper |
-| **Architecture health** | architect → design-reviewer → planner → builder → code-reviewer → quality-auditor → gitops |
+| Task type | Phases (abbrev) | Grill | Ends at |
+| --- | --- | --- | --- |
+| **Feature** | align → design → design_review → (planning if multi) → delivery → ship | yes | `/aiops-implement` |
+| **Feature + UI** | + ui_mockup before design_review | yes | `/aiops-implement` |
+| **Bug** | diagnose → delivery → ship | no | `/aiops-implement` |
+| **Incoming** | triage → (align if unclear) → delivery → ship | conditional | `/aiops-implement` |
+| **Architecture health** | architecture_scan → align → design → design_review → … | yes | `/aiops-implement` |
+| **Prototype** | prototype only | — | `VERDICT.md` |
+| **New personal skill** | skill_authoring checklist | yes | new `SKILL.md` |
 
-## Agent dispatch protocol
+**Multi-session**: after design_review → `planning_prd` → `planning_issues` → fresh session per issue (`current_issue` in journey) → delivery per issue.
 
-1. **Load agent**: Read `agents/<name>.md` for Identity + Constraints
-2. **Gather inputs**: Read upstream artifacts from `.scratch/<feature>/` per agent's Inputs section
-3. **Execute**: Run agent with its available skills, following Constraints
-4. **Write outputs**: Agent writes artifacts per its Outputs section
-5. **Transition**: Load next agent in sequence, repeat from step 2
+**Prototype branch** (optional): handoff → `/prototype` → handoff back; require `VERDICT.md` before planner/builder.
 
-## Feature slug
-
-Router generates a kebab-case slug from the task description (e.g. "做一个用户登录功能" → `login`). User can override. All `.scratch/` artifacts are stored under `.scratch/<slug>/`.
-
-## Conditional gates
-
-- **Grill**: Feature, Architecture health, New personal skill; Incoming only if still unclear after triage
-- **Design review**: Feature, Feature + UI, Architecture health (DESIGN_REVIEW.md APPROVE required before planner)
-- **Prototype verdict**: if Prototyper ran (Tier 2), require `VERDICT.md` before Planner or Builder
-
-Lean is **not** active during grill/alignment.
+Lean is **not** active during grill/alignment phases.
 
 ## Multi-session heuristic
 
-Recommend **multi-session** when: 3+ modules, multiple slices, near smart zone, or AFK per-issue. Recommend **single-session** when: one module, one tracer bullet, under ~30 minutes. **User confirms** before Planner runs `/to-prd`.
+Recommend **multi-session** when: 3+ modules, multiple slices, near smart zone, or AFK per-issue. **Default single-session** — do not ask unless heuristics suggest multi; confirm once before `planning_prd` only when recommending multi.
 
 ## New personal skill checklist
 
 1. Purpose and trigger scenarios
 2. User-invoked vs model-invoked
 3. Steps vs reference files (progressive disclosure)
-4. Author `SKILL.md` — use Cursor **create-skill** (External; see `docs/skill-registry.md`)
+4. Author `SKILL.md` — Cursor **create-skill** (External; `docs/skill-registry.md`)
 
-## Canonical routes
+## Reference
 
-Maintainer-tested routing logic lives in this repository at `scripts/lib/router.py` (`plan_flow`). After install, use the task-type table above — you do not need that file in target projects.
-
-Task type vocabulary: see your target project's `CONTEXT.md` if present. Skill registry: `docs/skill-registry.md` in the target project after `/aiops-setup`.
+- Journey file format: [journey.md](journey.md)
+- User narration keys: [narration.md](narration.md)
+- Maintainer canonical routes: `scripts/lib/router.py` (`plan_flow`) + `scripts/lib/flow_cli.py`
+- Project config yaml: [aiops-setup/aiops-yaml.md](../aiops-setup/aiops-yaml.md)
+- Vocabulary: target `CONTEXT.md`; skill registry: `docs/skill-registry.md`

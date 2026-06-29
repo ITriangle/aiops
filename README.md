@@ -1,162 +1,172 @@
 # aiops
 
-[中文文档](README.zh-CN.md)
+[English](README.en.md)
 
-Personal agent skills bundle for AI-assisted software development — grill, plan, implement, and ship with hard quality gates. Install once, use in any codebase across **6 AI IDEs**.
+面向 AI 辅助软件开发的 agent skills bundle —— 一条 `/aiops` 命令带你对齐、实现、交付，全程硬质量门控。安装一次，跨 **6 个 AI IDE** 使用。
 
-Entry skill: `/aiops`.
+入口：`**/aiops**`（Flow Conductor — 中文步骤引导，进度可恢复）
 
-## Key features
+## 核心特性
 
-- **20 skills** covering the full dev lifecycle: alignment → design review → planning → delivery → review → ship
-- **9 specialized agents** with artifact contracts and dispatch sequences
-- **Always-on lean discipline** — YAGNI ladder auto-injected into every coding turn (Cursor `.mdc`, Copilot instructions, Windsurf `.mdc`)
-- **Multi-IDE portability** — one source of truth (`SKILL.md`), adapter seam compiles to each IDE's native format
-- **Lifecycle hooks** — SessionStart/SubagentStart injection for Claude Code and Codex
-- **AGENTS.md generation** — project-level agent protocol file for any compatible harness
+- **一条命令开工** — 用中文描述目标即可；进度写在 `.scratch/<功能名>/flow.state.yaml`，`/aiops 继续` 接着做
+- **20 个 skills** — 对齐 → 设计评审 → 规划 → 交付 → 评审 → 发布
+- **9 个专业 agents** — 制品契约与调度序列（普通用户不必记名字）
+- **零配置默认** — 无 `aiops.yaml` 时用本地 markdown 记任务；团队可配置 GitHub/GitLab
+- **始终生效的 lean 纪律** — YAGNI ladder 自动注入编码 turn（Cursor / Copilot / Windsurf rules）
+- **多 IDE 可移植** — `SKILL.md` 单一来源，adapter 编译为各 IDE 原生格式
 
-## Quick start
+## 快速开始
 
 ```bash
-# Install to all detected AI IDEs (project-local, default)
+# 安装到所有检测到的 AI IDE（项目级，默认）
 npx -y github:yugasun/aiops
 
-# Or via curl
+# 或通过 curl
 curl -fsSL https://raw.githubusercontent.com/yugasun/aiops/main/install.sh | bash
 ```
 
-### CLI options
+在目标项目聊天框输入：
+
+```
+/aiops 我想加一个健康检查接口
+```
+
+隔天继续：
+
+```
+/aiops 继续
+```
+
+### CLI 选项
 
 ```bash
-# Target a specific IDE
+# 指定 IDE
 npx -y github:yugasun/aiops --ide cursor
 npx -y github:yugasun/aiops --ide claude
 npx -y github:yugasun/aiops --ide codex
 npx -y github:yugasun/aiops --ide copilot
 npx -y github:yugasun/aiops --ide windsurf
 
-# Global install (to ~/)
+# 全局安装（到 ~/）
 npx -y github:yugasun/aiops -g
 
-# Selective install
-npx -y github:yugasun/aiops --skills-only
-npx -y github:yugasun/aiops --agents-only
+# 选择性安装
+npx -y github:yugasun/aiops --skills-only     # 仅 skills
+npx -y github:yugasun/aiops --agents-only     # 仅 agents
 
-# List detected IDEs without installing
+# 查看检测到的 IDE（不安装）
 npx -y github:yugasun/aiops --list
 
-# Uninstall
+# 卸载
 npx -y github:yugasun/aiops --uninstall
 ```
 
-### Claude Code Plugin (alternate)
+### Claude Code 插件（备选）
 
 ```
 /plugin marketplace add yugasun/aiops
 /plugin install aiops@aiops
 ```
 
-## Supported IDEs
+插件命令带 `aiops:` 前缀（如 `/aiops:aiops`）；Skills CLI 安装则直接用 `/aiops`。
 
-| IDE | Skills Path | Always-On | Agents | Hooks |
-| --- | --- | --- | --- | --- |
-| **Claude Code** | `.claude/skills/` | via `/lean` trigger | `.claude/agents/*.md` | SessionStart + SubagentStart |
-| **Cursor** | `.cursor/skills/` | `.cursor/rules/lean.mdc` | `.cursor/agents/*.md` | — |
-| **Codex CLI** | `.agents/skills/` | via `AGENTS.md` | `.codex/agents/*.toml` | — |
-| **Windsurf** | `.windsurf/skills/` | `.windsurf/rules/lean.mdc` | `.windsurf/agents/*.md` | — |
-| **GitHub Copilot** | `.github/skills/` | `.github/copilot-instructions.md` | `.github/agents/*.md` | — |
-| **Generic harness** | — | `AGENTS.md` (project root) | — | — |
+## 支持的 IDE
 
-## What you get
 
-### Skills (20 Tier 1)
+| IDE                | Skills 路径           | Always-On                         | Agents                  | Hooks                        |
+| ------------------ | ------------------- | --------------------------------- | ----------------------- | ---------------------------- |
+| **Claude Code**    | `.claude/skills/`   | 通过 `/lean` 触发                     | `.claude/agents/*.md`   | SessionStart + SubagentStart |
+| **Cursor**         | `.cursor/skills/`   | `.cursor/rules/lean.mdc`          | `.cursor/agents/*.md`   | —                            |
+| **Codex CLI**      | `.agents/skills/`   | 通过 `AGENTS.md`                    | `.codex/agents/*.toml`  | —                            |
+| **Windsurf**       | `.windsurf/skills/` | `.windsurf/rules/lean.mdc`        | `.windsurf/agents/*.md` | —                            |
+| **GitHub Copilot** | `.github/skills/`   | `.github/copilot-instructions.md` | `.github/agents/*.md`   | —                            |
+| **通用 harness**     | —                   | `AGENTS.md`（项目根目录）                | —                       | —                            |
 
-| Layer | Skills |
-| --- | --- |
-| **Router** | `/aiops` — pick task type and flow |
-| **Setup** | `/aiops-setup` — issue tracker, triage labels, domain docs |
-| **Alignment** | `/grill-with-docs`, `/grilling`, `/domain-modeling`, `/architect-design` |
-| **Planning** | `/to-prd`, `/to-issues`, `/handoff`, `/prototype` |
-| **Delivery** | `/aiops-implement` → `/lean` → `/tdd` → `/review` → `/prune` |
-| **Architecture** | `/improve-codebase-architecture` — scan for deepening opportunities |
-| **Other paths** | `/diagnosing-bugs`, `/triage`, `/ui-mockup`, `/gitops` |
 
-Full list: [`skills/manifest.json`](skills/manifest.json)
+## 功能清单
 
-### Agents (9)
+### Skills（20 个 Tier 1）
 
-| Agent | Role | Key Output |
-| --- | --- | --- |
-| `architect` | Design decisions + tech-spec | NOTES.md, tech-spec.md |
-| `design-reviewer` | Design review gate | DESIGN_REVIEW.md |
-| `planner` | Task breakdown + plan | PRD.md, plan.md, issues/ |
-| `prototyper` | Rapid validation | VERDICT.md, prototype/ |
-| `builder` | TDD implementation | source code + tests |
-| `ui-designer` | HTML mockups | mockups/ |
-| `code-reviewer` | Code review | REVIEW.md |
-| `quality-auditor` | YAGNI check | prune findings |
-| `gitops` | Git operations | commit + push |
 
-### Lean discipline (always-on)
+| 层      | Skills                                                                |
+| ------ | --------------------------------------------------------------------- |
+| **路由** | `/aiops` — Flow Conductor，推断场景并分步引导                                   |
+| **设置** | `/aiops-setup` — issue 跟踪、triage 标签、领域文档                              |
+| **对齐** | `/grill-with-docs`、`/grilling`、`/domain-modeling`、`/architect-design` |
+| **规划** | `/to-prd`、`/to-issues`、`/handoff`、`/prototype`                        |
+| **交付** | `/aiops-implement` → `/lean` → `/tdd` → `/prune` → `/review`          |
+| **架构** | `/improve-codebase-architecture` — 扫描深化机会                             |
+| **其他** | `/diagnosing-bugs`、`/triage`、`/ui-mockup`、`/gitops`                   |
 
-The YAGNI ladder is auto-injected into every coding turn for supported IDEs:
 
-```
-1. Does this need to exist? (YAGNI)
-2. Stdlib does it?
-3. Native platform feature?
-4. Already-installed dependency?
-5. One line?
-6. Minimum code that works
-```
+完整列表：[`skills/manifest.json`](skills/manifest.json)
 
-Delivery sequence: **lean → TDD → review → prune → commit** (only on user approval).
+### Agents（9 个）
 
-## Architecture
+
+| Agent             | 角色          | 核心输出                     |
+| ----------------- | ----------- | ------------------------ |
+| `architect`       | 设计决策 + 技术规格 | NOTES.md, tech-spec.md   |
+| `design-reviewer` | 设计评审门控      | DESIGN_REVIEW.md         |
+| `planner`         | 任务拆解 + 计划   | PRD.md, plan.md, issues/ |
+| `prototyper`      | 快速验证        | VERDICT.md, prototype/   |
+| `builder`         | TDD 实现      | 源码 + 测试                  |
+| `ui-designer`     | HTML 原型     | mockups/                 |
+| `code-reviewer`   | 代码评审        | REVIEW.md                |
+| `quality-auditor` | YAGNI 审计    | prune 发现                 |
+| `gitops`          | Git 操作      | commit + push            |
+
+
+### Lean 纪律（始终生效）
+
+YAGNI ladder 在支持的 IDE 中自动注入每次编码 turn：
 
 ```
-                    ┌─── build scripts ──→ .cursor/rules/lean.mdc
-                    │                      .github/copilot-instructions.md
-                    │                      .windsurf/rules/lean.mdc
-                    │                      AGENTS.md
+1. 这真的需要存在吗？(YAGNI)
+2. 标准库能做吗？
+3. 平台原生特性？
+4. 已安装的依赖？
+5. 一行代码？
+6. 能工作的最少代码
+```
+
+交付序列：**lean → TDD → prune → review → commit**（仅在用户明确要求后提交）。
+
+## 在目标项目中使用
+
+1. 打开项目，直接 `/aiops …` — 首次会自动静默配置（本地 markdown issue + 默认标签）
+2. 团队用 GitHub/GitLab 时，在项目根添加 `aiops.yaml`（见 `skills/aiops-setup/aiops.yaml.example`）
+3. 大任务默认单次会话；多模块时可拆 PRD + 多个 issue
+
+详情：[**docs/getting-started.zh-CN.md**](docs/getting-started.zh-CN.md)（[English](docs/getting-started.md)）
+
+## 架构
+
+```
+                    ┌─── 构建脚本 ────→ .cursor/rules/lean.mdc
+                    │                   .github/copilot-instructions.md
+                    │                   .windsurf/rules/lean.mdc
+                    │                   AGENTS.md
                     │
-skills/lean/SKILL.md ─── install time ──→ Cursor: .cursor/rules/lean.mdc (always-on)
-                    │                     Copilot: .github/copilot-instructions.md
-                    │                     Windsurf: .windsurf/rules/lean.mdc
-                    │                     Claude/Codex: skills dir (copy)
+skills/lean/SKILL.md ─── 安装时 ────→ Cursor / Copilot / Windsurf: always-on rules
+                    │                  Claude / Codex: skills 目录
                     │
-                    └─── hooks ──────────→ SessionStart: lean ladder in context
-                                           SubagentStart: compact lean reminder
+                    └─── hooks ──────→ SessionStart / SubagentStart
 ```
 
-**Adapter seam** (`scripts/adapters/`) converts `SKILL.md` to IDE-native formats at install time. Adding a new IDE = writing one adapter file.
-
-**Build scripts** (`scripts/build/`) pre-generate artifacts for repo-committed output:
+**Adapter seam**（`scripts/adapters/`）在安装时将 `SKILL.md` 转为 IDE 原生格式。
 
 ```bash
-node scripts/build/build-all.js    # Generate all IDE-native artifacts
+node scripts/build/build-all.js    # 维护者：生成所有 IDE 原生制品
 ```
 
-## In a target project
+## 文档
 
-1. Run `/aiops-setup` once (issue tracker, labels, `CONTEXT.md` layout).
-2. Run `/aiops` for every new task.
+- [快速开始](docs/getting-started.zh-CN.md)
+- [Agent 注册表](docs/agent-registry.md)
+- [Skill 注册表](docs/skill-registry.md)
+- [项目网站](website/index.html) — 交互示例与 use cases
 
-Details: **[docs/getting-started.md](docs/getting-started.md)**.
+## 许可证
 
-## Verify (maintainers)
-
-```bash
-bash scripts/verify.sh          # source checks (skills + agents)
-node scripts/build/build-all.js # generate IDE-native artifacts
-```
-
-## Docs
-
-- [Getting started](docs/getting-started.md) — install, setup, example dev flow
-- [Agent registry](docs/agent-registry.md) — agents, dispatch sequences, artifact contracts
-- [Skill registry](docs/skill-registry.md) — install paths + allowed references
-
-## License
-
-Apache 2.0 — see [LICENSE](LICENSE). Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
+Apache 2.0 — 见 [LICENSE](LICENSE)。贡献指南：[CONTRIBUTING.md](CONTRIBUTING.md)。

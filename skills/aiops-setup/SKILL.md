@@ -1,24 +1,41 @@
 ---
 name: aiops-setup
-description: Configure a target project for the aiops bundle — issue tracker, triage labels, domain doc layout. Run once per project before other engineering skills.
+description: Configure a target project for the aiops bundle — issue tracker, triage labels, domain doc layout. Silent defaults on inline bootstrap; full prompts on explicit /aiops-setup.
 disable-model-invocation: true
 ---
 
 # aiops-setup
 
-Scaffold per-repo config the bundle assumes: **issue tracker**, **triage labels**, **domain docs**. Prompt-driven — explore, confirm one decision at a time, then write.
+Scaffold per-repo config: **issue tracker**, **triage labels**, **domain docs**.
 
-## Process
+## Modes
+
+### Silent bootstrap (from `/aiops` conductor)
+
+When `docs/agents/` is missing:
+
+1. Read repo-root `aiops.yaml` if present — see [aiops-yaml.md](aiops-yaml.md).
+2. **No yaml** → `issue_tracker.kind: local`, triage labels 1:1, `domain.layout: single`. Write `docs/agents/*` **without asking**.
+3. **Yaml with `github` or `gitlab`** → seed matching `issue-tracker-*.md`; apply yaml `prs_as_triage` and label overrides. No A/B/C questionnaire unless yaml is incomplete.
+4. Update `CLAUDE.md` or `AGENTS.md` `## Agent skills` block (create section if missing; ask only if neither file exists).
+
+### Full setup (explicit `/aiops-setup`)
+
+Interactive — explore, confirm one section at a time, then write. Use when switching tracker or restarting config.
+
+## Full setup process
 
 ### 1. Explore
 
-Check: `git remote`, `AGENTS.md` / `CLAUDE.md`, `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`, `docs/agents/`, `.scratch/`.
+Check: `aiops.yaml`, `git remote`, `AGENTS.md` / `CLAUDE.md`, `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`, `docs/agents/`, `.scratch/`.
 
 ### 2. Ask (one section at a time)
 
-**A — Issue tracker:** GitHub (`gh`), GitLab (`glab`), local markdown (`.scratch/<feature>/`), or other (user describes). For GitHub/GitLab only: PRs as triage surface? (default no)
+Skip sections already satisfied by `aiops.yaml` — show yaml values and offer edit only.
 
-**B — Triage labels:** Map five roles (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`) to tracker strings. Default 1:1.
+**A — Issue tracker:** Only offer GitHub/GitLab in the questionnaire if user has no `aiops.yaml` **and** explicitly asks for remote tracker. Otherwise default local markdown.
+
+**B — Triage labels:** Map five roles to tracker strings. Default 1:1.
 
 **C — Domain docs:** Single-context (`CONTEXT.md` + `docs/adr/`) or multi-context (`CONTEXT-MAP.md`).
 
@@ -28,10 +45,8 @@ Show `## Agent skills` block + `docs/agents/issue-tracker.md`, `triage-labels.md
 
 ### 4. Write
 
-Edit `CLAUDE.md` if present, else `AGENTS.md` (ask if neither exists). Update existing `## Agent skills` in-place.
-
-Seed templates in this folder: `issue-tracker-*.md`, `triage-labels.md`, `domain.md`.
+Seed templates: `issue-tracker-*.md`, `triage-labels.md`, `domain.md`.
 
 ### 5. Done
 
-Point user to `docs/agents/*.md` for later edits. Re-run only to switch trackers or restart.
+Point user to `docs/agents/*.md`. Optional: add `aiops.yaml` from [aiops.yaml.example](aiops.yaml.example) for reproducible team defaults.

@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>aiops — AI-powered agile dev workflow</title>
-<meta name="description" content="9 specialized AI agents, 20 skills, 6 IDEs. Align, design, implement, and ship with artifact contracts and hard quality gates.">
+<title>aiops — 一条命令，带你看懂 AI 敏捷开发</title>
+<meta name="description" content="装一次，在 AI IDE 里输入 /aiops，用中文一步步对齐、实现、交付。支持 Cursor、Claude Code、Codex 等 6 个 IDE。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0a0b0f;
@@ -25,1219 +25,886 @@
   --green: #4ade80;
   --green-dim: rgba(74,222,128,0.12);
   --yellow: #fbbf24;
-  --yellow-dim: rgba(251,191,36,0.12);
-  --red: #f87171;
-  --cyan: #22d3ee;
-  --purple: #a78bfa;
-  --orange: #fb923c;
-  --pink: #f472b6;
-  --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  --mono: 'JetBrains Mono', monospace;
   --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius: 12px;
+  --transition: 0.2s ease;
 }
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
 html { scroll-behavior: smooth; }
-
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--sans);
-  line-height: 1.6;
+  line-height: 1.65;
   overflow-x: hidden;
 }
-
 ::selection { background: var(--accent-dim); color: #fff; }
-
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-/* ─── Nav ─── */
+/* Nav */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  background: rgba(10,11,15,0.85);
-  backdrop-filter: blur(16px);
+  background: rgba(10,11,15,0.88); backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
-  padding: 0 2rem;
-  height: 56px;
+  padding: 0 1.25rem; height: 52px;
   display: flex; align-items: center; justify-content: space-between;
 }
-.nav-logo {
-  font-family: var(--mono); font-weight: 700; font-size: 1.1rem;
-  color: var(--text); letter-spacing: -0.02em;
-}
+.nav-logo { font-family: var(--mono); font-weight: 700; font-size: 1.05rem; color: var(--text); cursor: default; }
 .nav-logo span { color: var(--accent); }
-.nav-links { display: flex; gap: 1.5rem; align-items: center; }
+.nav-links { display: flex; gap: 0.25rem; align-items: center; }
 .nav-links a {
-  color: var(--text-dim); font-size: 0.85rem; font-weight: 500;
-  transition: color 0.2s;
+  color: var(--text-dim); font-size: 0.82rem; font-weight: 500;
+  padding: 0.35rem 0.65rem; border-radius: 6px; transition: var(--transition);
 }
-.nav-links a:hover { color: var(--text); text-decoration: none; }
+.nav-links a:hover, .nav-links a.active { color: var(--text); background: var(--surface); text-decoration: none; }
+.nav-toggle {
+  display: none; background: none; border: 1px solid var(--border);
+  color: var(--text); padding: 0.35rem 0.6rem; border-radius: 6px;
+  font-family: var(--mono); font-size: 0.75rem; cursor: pointer;
+}
 
-/* ─── Container ─── */
-.container { max-width: 1080px; margin: 0 auto; padding: 0 2rem; }
+.container { max-width: 920px; margin: 0 auto; padding: 0 1.25rem; }
 
-/* ─── Hero ─── */
+/* Hero */
 .hero {
-  padding: 10rem 0 6rem;
-  text-align: center;
-  position: relative;
+  padding: 7rem 0 3.5rem; text-align: center; position: relative;
 }
-.hero::before {
-  content: '';
-  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-  width: 800px; height: 600px;
-  background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+.hero-glow {
+  position: absolute; top: -10%; left: 50%; transform: translateX(-50%);
+  width:  min(90vw, 720px); height: 480px;
+  background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 68%);
   pointer-events: none;
 }
-.hero-badge {
-  display: inline-flex; align-items: center; gap: 0.5rem;
-  font-family: var(--mono); font-size: 0.75rem; color: var(--text-dim);
-  background: var(--surface); border: 1px solid var(--border);
-  padding: 0.35rem 1rem; border-radius: 999px; margin-bottom: 2rem;
+.hero-tag {
+  display: inline-block; font-family: var(--mono); font-size: 0.72rem;
+  color: var(--green); background: var(--green-dim);
+  border: 1px solid rgba(74,222,128,0.25);
+  padding: 0.3rem 0.85rem; border-radius: 999px; margin-bottom: 1.25rem;
+  animation: fadeUp 0.6s ease both;
 }
-.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
 .hero h1 {
-  font-family: var(--mono); font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 700; line-height: 1.1; letter-spacing: -0.03em;
-  margin-bottom: 1.5rem;
+  font-size: clamp(1.85rem, 5vw, 2.75rem);
+  font-weight: 700; line-height: 1.25; letter-spacing: -0.02em;
+  margin-bottom: 1rem; animation: fadeUp 0.6s 0.08s ease both;
 }
 .hero h1 .accent { color: var(--accent); }
-.hero h1 .dim { color: var(--text-dim); font-weight: 300; }
-.hero-sub {
-  font-size: 1.15rem; color: var(--text-dim); max-width: 640px;
-  margin: 0 auto 2.5rem; line-height: 1.7;
+.hero-lead {
+  font-size: 1.05rem; color: var(--text-dim); max-width: 540px;
+  margin: 0 auto 1.75rem; animation: fadeUp 0.6s 0.16s ease both;
 }
-.hero-ctas { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-.btn {
-  font-family: var(--mono); font-size: 0.85rem; font-weight: 600;
-  padding: 0.7rem 1.5rem; border-radius: 8px;
-  border: 1px solid; cursor: pointer; transition: all 0.2s;
-  display: inline-flex; align-items: center; gap: 0.5rem;
-}
-.btn-primary {
-  background: var(--accent); border-color: var(--accent);
-  color: #fff;
-}
-.btn-primary:hover { background: #5a7af0; text-decoration: none; }
-.btn-secondary {
-  background: transparent; border-color: var(--border-light);
-  color: var(--text);
-}
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
 
-/* ─── Install bar ─── */
-.install-bar {
-  max-width: 680px; margin: 3rem auto 0;
+/* Terminal block */
+.terminal {
+  max-width: 560px; margin: 0 auto 1.5rem;
   background: var(--bg-2); border: 1px solid var(--border);
-  border-radius: 10px; overflow: hidden;
+  border-radius: var(--radius); overflow: hidden;
+  animation: fadeUp 0.6s 0.24s ease both;
+  text-align: left;
 }
-.install-bar-header {
-  display: flex; align-items: center; gap: 0.5rem;
-  padding: 0.6rem 1rem;
-  border-bottom: 1px solid var(--border);
-  font-family: var(--mono); font-size: 0.7rem; color: var(--text-dim);
-}
-.install-bar-header .dots { display: flex; gap: 4px; }
-.install-bar-header .dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--border-light); }
-.install-bar code {
-  display: block; padding: 1rem 1.5rem;
-  font-family: var(--mono); font-size: 0.9rem;
-  color: var(--green);
-}
-.install-bar code .prompt { color: var(--text-muted); }
-
-/* ─── Section ─── */
-section { padding: 5rem 0; }
-.section-label {
-  font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase;
-  letter-spacing: 0.15em; color: var(--accent); margin-bottom: 0.75rem;
-}
-.section-title {
-  font-family: var(--mono); font-size: clamp(1.5rem, 3vw, 2rem);
-  font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1rem;
-}
-.section-desc {
-  font-size: 1rem; color: var(--text-dim); max-width: 640px;
-  margin-bottom: 3rem; line-height: 1.7;
-}
-
-/* ─── Stats ─── */
-.stats-row {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem; margin: 3rem 0;
-}
-.stat-card {
-  background: var(--bg-2); border: 1px solid var(--border);
-  border-radius: 12px; padding: 1.5rem; text-align: center;
-}
-.stat-value {
-  font-family: var(--mono); font-size: 2rem; font-weight: 700;
-  color: var(--accent); line-height: 1;
-}
-.stat-label {
-  font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem;
-}
-
-/* ─── Dispatch workflows ─── */
-.workflow-tabs {
-  display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem;
-}
-.workflow-tab {
-  font-family: var(--mono); font-size: 0.75rem; font-weight: 600;
-  padding: 0.5rem 1rem; border-radius: 8px;
-  border: 1px solid var(--border); background: transparent;
-  color: var(--text-dim); cursor: pointer; transition: all 0.2s;
-}
-.workflow-tab:hover { border-color: var(--border-light); color: var(--text); }
-.workflow-tab.active {
-  background: var(--accent-glow); border-color: var(--accent-dim);
-  color: var(--accent);
-}
-.workflow-flow {
-  display: flex; align-items: center; justify-content: center;
-  gap: 0.5rem; flex-wrap: wrap; padding: 2rem;
-  background: var(--bg-2); border: 1px solid var(--border);
-  border-radius: 12px; min-height: 100px;
-}
-.flow-agent {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 0.3rem; padding: 0.75rem 1rem;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 10px; transition: all 0.2s;
-  min-width: 90px;
-}
-.flow-agent:hover { border-color: var(--accent-dim); transform: translateY(-2px); }
-.flow-agent .flow-agent-name {
-  font-family: var(--mono); font-size: 0.8rem; font-weight: 600;
-  color: var(--accent);
-}
-.flow-agent .flow-agent-role {
-  font-size: 0.6rem; color: var(--text-muted);
-  text-transform: uppercase; letter-spacing: 0.05em;
-}
-.flow-agent.role-alignment { border-color: rgba(108,138,255,0.3); }
-.flow-agent.role-planning { border-color: rgba(251,191,36,0.3); }
-.flow-agent.role-design { border-color: rgba(244,114,182,0.3); }
-.flow-agent.role-delivery { border-color: rgba(74,222,128,0.3); }
-.flow-agent.role-delivery-gate { border-color: rgba(239,68,68,0.3); }
-.flow-agent.role-design-gate { border-color: rgba(167,139,250,0.3); }
-.flow-agent.role-prototype { border-color: rgba(34,211,238,0.3); }
-.flow-arrow {
-  color: var(--text-muted); font-size: 1rem;
-  font-family: var(--mono); flex-shrink: 0;
-}
-.workflow-desc {
-  margin-top: 1rem; font-size: 0.85rem; color: var(--text-dim);
-  text-align: center;
-}
-
-/* ─── Agent card (enriched) ─── */
-.agents-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.25rem;
-}
-.agent-card {
-  background: var(--bg-2); border: 1px solid var(--border);
-  border-left: 3px solid var(--border);
-  border-radius: 12px; padding: 1.5rem;
-  transition: border-color 0.3s, transform 0.2s;
-}
-.agent-card:hover { transform: translateY(-2px); }
-.agent-card.role-alignment { border-left-color: var(--accent); }
-.agent-card.role-planning { border-left-color: var(--yellow); }
-.agent-card.role-design { border-left-color: var(--pink); }
-.agent-card.role-delivery { border-left-color: var(--green); }
-.agent-card.role-delivery-gate { border-left-color: var(--red); }
-.agent-card.role-design-gate { border-left-color: var(--purple); }
-.agent-card.role-prototype { border-left-color: var(--cyan); }
-.agent-card-header {
+.terminal-bar {
   display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 0.6rem;
+  padding: 0.5rem 0.85rem; border-bottom: 1px solid var(--border);
+  font-family: var(--mono); font-size: 0.68rem; color: var(--text-muted);
 }
-.agent-card-name {
-  font-family: var(--mono); font-size: 0.95rem; font-weight: 600;
-  color: var(--text);
+.terminal-dots { display: flex; gap: 5px; }
+.terminal-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--border-light); }
+.terminal-body { padding: 1rem 1.15rem; }
+.terminal-prompt { font-family: var(--mono); font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+.terminal-input {
+  font-family: var(--mono); font-size: 0.9rem; color: var(--green);
+  min-height: 1.4em; word-break: break-word;
 }
-.agent-card-role {
-  font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.08em; padding: 0.2rem 0.55rem;
-  border-radius: 999px;
-}
-.role-badge-alignment { background: rgba(108,138,255,0.15); color: var(--accent); border: 1px solid rgba(108,138,255,0.25); }
-.role-badge-planning { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(251,191,36,0.25); }
-.role-badge-design { background: rgba(244,114,182,0.12); color: var(--pink); border: 1px solid rgba(244,114,182,0.25); }
-.role-badge-delivery { background: var(--green-dim); color: var(--green); border: 1px solid rgba(74,222,128,0.25); }
-.role-badge-gate { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.25); }
-.role-badge-design-gate { background: rgba(167,139,250,0.12); color: var(--purple); border: 1px solid rgba(167,139,250,0.25); }
-.role-badge-prototype { background: rgba(34,211,238,0.12); color: var(--cyan); border: 1px solid rgba(34,211,238,0.25); }
-.agent-card-desc {
-  font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.85rem;
-  line-height: 1.5;
-}
-.agent-card-skills {
-  display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.75rem;
-}
-.skill-pill {
-  font-family: var(--mono); font-size: 0.65rem;
-  padding: 0.2rem 0.5rem; border-radius: 6px;
-  background: var(--bg-3); color: var(--text-dim);
-  border: 1px solid var(--border);
-}
-.agent-card-outputs {
-  font-family: var(--mono); font-size: 0.7rem; color: var(--text-muted);
-  padding-top: 0.65rem; border-top: 1px solid var(--border);
-}
-.agent-card-outputs span { color: var(--text-dim); }
+.terminal-hint { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.65rem; }
+.terminal-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
 
-/* ─── Skills table ─── */
-.skills-table-wrap { overflow-x: auto; }
-.skills-table {
-  width: 100%; border-collapse: collapse;
-  font-size: 0.85rem;
+.btn {
+  font-family: var(--mono); font-size: 0.78rem; font-weight: 600;
+  padding: 0.5rem 0.9rem; border-radius: 8px; border: 1px solid;
+  cursor: pointer; transition: var(--transition);
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  background: transparent; color: var(--text-dim);
+  border-color: var(--border);
 }
-.skills-table thead th {
-  font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase;
-  letter-spacing: 0.1em; color: var(--text-dim);
-  text-align: left; padding: 0.65rem 0.75rem;
-  border-bottom: 2px solid var(--border);
-}
-.skills-table tbody td {
-  padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--border);
-  color: var(--text-dim);
-}
-.skills-table tbody td:first-child {
-  font-family: var(--mono); font-size: 0.8rem; color: var(--text);
-}
-.skills-table tbody tr:hover td { background: rgba(108,138,255,0.03); }
-.skills-table .layer-head {
-  font-family: var(--mono); font-size: 0.65rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--text-muted); background: var(--bg-3);
-}
-.skills-table .layer-head td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); }
-.skill-used-by {
-  display: flex; flex-wrap: wrap; gap: 0.25rem;
-}
-.skill-used-by code {
-  font-family: var(--mono); font-size: 0.65rem;
-  background: var(--accent-glow); color: var(--accent);
-  padding: 0.1rem 0.4rem; border-radius: 4px;
-}
+.btn:hover { border-color: var(--border-light); color: var(--text); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { background: #5a7af0; color: #fff; }
+.btn-ghost { background: transparent; border-color: var(--border-light); color: var(--text); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-sm { padding: 0.35rem 0.65rem; font-size: 0.72rem; }
+.btn.copied { border-color: var(--green); color: var(--green); }
 
-/* ─── Delivery gates ─── */
-.delivery-section {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start;
+.btn-row { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;
+  animation: fadeUp 0.6s 0.32s ease both; }
+
+/* Sections */
+section { padding: 3.25rem 0; }
+.section-label {
+  font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--accent); margin-bottom: 0.45rem;
 }
-@media (max-width: 768px) { .delivery-section { grid-template-columns: 1fr; } }
-.gate-flow {
-  display: flex; align-items: center; gap: 0.35rem;
-  flex-wrap: wrap; margin-bottom: 1.5rem;
-}
-.gate-step {
-  font-family: var(--mono); font-size: 0.8rem; font-weight: 600;
-  padding: 0.45rem 0.9rem; border-radius: 8px;
-  background: var(--surface); border: 1px solid var(--border);
-  color: var(--text);
-}
-.gate-arrow { color: var(--text-muted); font-size: 0.9rem; }
-.ladder-compact {
+.section-title { font-size: 1.45rem; font-weight: 700; margin-bottom: 0.6rem; letter-spacing: -0.02em; }
+.section-desc { color: var(--text-dim); margin-bottom: 1.5rem; max-width: 640px; font-size: 0.95rem; }
+
+/* Card shell */
+.card {
   background: var(--bg-2); border: 1px solid var(--border);
-  border-radius: 10px; padding: 1.25rem 1.5rem;
-  font-family: var(--mono);
-}
-.ladder-compact .ladder-title {
-  font-size: 0.7rem; text-transform: uppercase;
-  letter-spacing: 0.1em; color: var(--text-dim);
-  margin-bottom: 0.75rem;
-}
-.ladder-compact .ladder-item {
-  display: flex; align-items: center; gap: 0.6rem;
-  padding: 0.35rem 0; font-size: 0.8rem; color: var(--text-dim);
-}
-.ladder-compact .ladder-item .num {
-  width: 20px; height: 20px; border-radius: 5px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.65rem; font-weight: 700; flex-shrink: 0;
-  background: var(--surface); color: var(--accent);
-  border: 1px solid var(--border);
-}
-.ladder-compact .ladder-item:first-child .num {
-  background: var(--accent-glow); border-color: var(--accent-dim);
-}
-.ladder-note {
-  margin-top: 0.75rem; font-size: 0.7rem; color: var(--text-dim);
-  font-style: italic; font-family: var(--sans);
+  border-radius: var(--radius); overflow: hidden;
 }
 
-/* ─── IDE matrix ─── */
-.ide-matrix { overflow-x: auto; }
-.ide-table {
-  width: 100%; border-collapse: collapse;
-  font-size: 0.85rem;
-}
-.ide-table th {
-  font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase;
-  letter-spacing: 0.1em; color: var(--text-dim);
-  text-align: left; padding: 0.75rem 1rem;
-  border-bottom: 2px solid var(--border);
-}
-.ide-table td {
-  padding: 0.75rem 1rem; border-bottom: 1px solid var(--border);
-  color: var(--text-dim);
-}
-.ide-table td:first-child {
-  font-family: var(--mono); font-weight: 600; color: var(--text);
-}
-.ide-table tr:hover td { background: rgba(108,138,255,0.03); }
-.check { color: var(--green); }
-.badge-sm {
-  font-family: var(--mono); font-size: 0.65rem;
-  padding: 0.15rem 0.5rem; border-radius: 999px;
-  background: var(--green-dim); color: var(--green);
-  border: 1px solid rgba(74,222,128,0.2);
-}
-
-/* ─── Footer ─── */
-footer {
-  border-top: 1px solid var(--border);
-  padding: 3rem 0;
-  text-align: center;
-}
-.footer-links {
-  display: flex; gap: 1.5rem; justify-content: center;
+/* Tabs */
+.tab-bar {
+  display: flex; gap: 0.35rem; flex-wrap: wrap;
   margin-bottom: 1rem;
 }
+.tab-bar.scrollable {
+  flex-wrap: nowrap; overflow-x: auto; padding-bottom: 0.25rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.tab-bar.scrollable::-webkit-scrollbar { display: none; }
+.tab-btn {
+  font-family: var(--mono); font-size: 0.75rem; font-weight: 600;
+  padding: 0.45rem 0.85rem; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg-3);
+  color: var(--text-dim); cursor: pointer; transition: var(--transition);
+  white-space: nowrap; flex-shrink: 0;
+}
+.tab-btn:hover { color: var(--text); border-color: var(--border-light); }
+.tab-btn.active {
+  background: var(--accent-glow); border-color: var(--accent-dim); color: var(--accent);
+}
+.tab-panel { display: none; animation: fadeIn 0.35s ease; }
+.tab-panel.active { display: block; }
+
+/* Steps - interactive */
+.steps-grid { display: grid; gap: 0.65rem; }
+.step-item {
+  display: grid; grid-template-columns: auto 1fr; gap: 1rem;
+  padding: 1rem 1.15rem; border-radius: 10px;
+  border: 1px solid transparent; cursor: pointer;
+  transition: var(--transition); background: var(--bg-2);
+}
+.step-item:hover { border-color: var(--border); }
+.step-item.active {
+  border-color: var(--accent-dim); background: var(--accent-glow);
+}
+.step-num {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--accent); font-family: var(--mono); font-weight: 700;
+  display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
+  transition: var(--transition);
+}
+.step-item.active .step-num {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+}
+.step-title { font-weight: 600; font-size: 0.92rem; margin-bottom: 0.2rem; }
+.step-body { font-size: 0.86rem; color: var(--text-dim); }
+.step-body code {
+  font-family: var(--mono); font-size: 0.78rem;
+  background: var(--bg-3); padding: 0.1rem 0.35rem; border-radius: 4px;
+}
+
+/* Narration live */
+.narration-live {
+  margin-top: 1rem; padding: 1.35rem;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.narration-step-line { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.65rem; }
+.narration-step-line em { color: var(--text-muted); font-style: normal; font-size: 0.8rem; font-weight: 400; }
+.narration-live p { color: var(--text-dim); font-size: 0.88rem; margin-bottom: 0.4rem; }
+.narration-btns { display: flex; gap: 0.45rem; flex-wrap: wrap; margin-top: 0.85rem; }
+.narration-btns button {
+  font-size: 0.72rem; font-family: var(--mono);
+  padding: 0.35rem 0.6rem; border-radius: 6px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-dim); cursor: pointer; transition: var(--transition);
+}
+.narration-btns button:hover { border-color: var(--accent-dim); color: var(--accent); }
+.progress-bar {
+  height: 4px; background: var(--border); border-radius: 2px;
+  margin-top: 1rem; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: var(--accent); border-radius: 2px;
+  transition: width 0.4s ease; width: 33%;
+}
+
+/* Flow chips - animated */
+.flow-viz {
+  padding: 1.25rem; display: flex; align-items: center;
+  flex-wrap: wrap; gap: 0.35rem;
+}
+.flow-chip {
+  font-size: 0.78rem; padding: 0.4rem 0.7rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text);
+  transition: var(--transition);
+}
+.flow-chip.highlight { border-color: var(--accent-dim); background: var(--accent-glow); color: var(--accent); }
+.flow-arrow { color: var(--text-muted); font-size: 0.8rem; }
+.flow-desc { padding: 0 1.25rem 1.25rem; font-size: 0.86rem; color: var(--text-dim); }
+
+/* Use case panel */
+.use-panel { padding: 1.35rem; }
+.use-header { margin-bottom: 1rem; }
+.use-tag {
+  font-family: var(--mono); font-size: 0.65rem; font-weight: 600;
+  color: var(--accent); letter-spacing: 0.05em; margin-bottom: 0.35rem;
+}
+.use-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+.use-scenario { font-size: 0.88rem; color: var(--text-dim); margin-bottom: 1rem; }
+.use-scenario code {
+  font-family: var(--mono); font-size: 0.78rem; background: var(--bg-3);
+  padding: 0.1rem 0.35rem; border-radius: 4px;
+}
+.cmd-block {
+  position: relative; background: var(--bg-3);
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 0.85rem 1rem; margin-bottom: 1rem;
+}
+.cmd-block pre {
+  font-family: var(--mono); font-size: 0.82rem; color: var(--green);
+  white-space: pre-wrap; word-break: break-word; line-height: 1.55;
+  padding-right: 3.5rem;
+}
+.cmd-block .cmd-copy {
+  position: absolute; top: 0.5rem; right: 0.5rem;
+}
+.use-outcome { font-size: 0.86rem; color: var(--text-dim); padding-top: 0.85rem; border-top: 1px solid var(--border); }
+.use-outcome strong { color: var(--text); }
+.use-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.65rem; }
+.use-meta span {
+  font-size: 0.7rem; font-family: var(--mono);
+  padding: 0.2rem 0.5rem; border-radius: 4px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text-muted);
+}
+.use-mini-flow {
+  display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.85rem;
+  padding: 0.75rem; background: var(--bg-3); border-radius: 8px;
+}
+.use-mini-flow span {
+  font-size: 0.7rem; padding: 0.25rem 0.5rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 5px; color: var(--text-dim);
+}
+
+/* Gates interactive */
+.gates-interactive { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+.gate-btn {
+  font-family: var(--mono); font-size: 0.76rem; font-weight: 600;
+  padding: 0.55rem 0.85rem; border-radius: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-dim); cursor: pointer; transition: var(--transition);
+  display: flex; align-items: center; gap: 0.4rem;
+}
+.gate-btn .gate-idx {
+  width: 18px; height: 18px; border-radius: 4px;
+  background: var(--bg-3); font-size: 0.65rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.gate-btn:hover { border-color: var(--border-light); color: var(--text); }
+.gate-btn.active { border-color: var(--accent-dim); background: var(--accent-glow); color: var(--accent); }
+.gate-btn.done .gate-idx { background: var(--green); color: var(--bg); }
+.gate-detail {
+  padding: 1.15rem; background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: var(--radius); font-size: 0.88rem; color: var(--text-dim);
+  min-height: 4rem; transition: var(--transition);
+}
+
+/* Install */
+.install-block { margin-bottom: 0.75rem; }
+.install-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.5rem 0.85rem; border-bottom: 1px solid var(--border);
+  font-family: var(--mono); font-size: 0.68rem; color: var(--text-muted);
+}
+.install-code {
+  padding: 0.85rem 1rem; font-family: var(--mono); font-size: 0.85rem; color: var(--green);
+  display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+}
+.install-code .prompt { color: var(--text-muted); }
+.config-card { padding: 1.25rem; margin-top: 1.25rem; }
+.config-card h3 { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.config-card p { font-size: 0.86rem; color: var(--text-dim); margin-bottom: 0.65rem; }
+.config-card pre {
+  font-family: var(--mono); font-size: 0.74rem;
+  background: var(--bg-3); padding: 1rem; border-radius: 8px;
+  color: var(--text-dim); overflow-x: auto; line-height: 1.5;
+}
+
+/* IDE */
+.ide-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.ide-table th {
+  font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--text-dim);
+  text-align: left; padding: 0.6rem 0.75rem; border-bottom: 2px solid var(--border);
+}
+.ide-table td {
+  padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--text-dim);
+}
+.ide-table td:first-child { font-family: var(--mono); font-weight: 600; color: var(--text); }
+.ide-table tr { transition: var(--transition); }
+.ide-table tbody tr:hover td { background: rgba(108,138,255,0.04); }
+
+details.advanced { margin-top: 1.5rem; }
+details.advanced summary {
+  padding: 1rem 1.15rem; cursor: pointer; font-weight: 600;
+  font-size: 0.88rem; list-style: none;
+}
+details.advanced summary::-webkit-details-marker { display: none; }
+details.advanced .inner {
+  padding: 0 1.15rem 1.15rem; font-size: 0.86rem; color: var(--text-dim);
+  border-top: 1px solid var(--border);
+}
+details.advanced .inner p { margin-top: 0.85rem; }
+details.advanced ul { margin: 0.5rem 0 0 1.15rem; }
+
+footer {
+  border-top: 1px solid var(--border); padding: 2.5rem 0; text-align: center;
+}
+.footer-links { display: flex; gap: 1.25rem; justify-content: center; margin-bottom: 0.75rem; }
 .footer-links a { color: var(--text-dim); font-size: 0.8rem; }
-.footer-links a:hover { color: var(--text-dim); }
-.footer-copy { font-size: 0.75rem; color: var(--text-dim); }
+.footer-copy { font-size: 0.75rem; color: var(--text-muted); }
 
-/* ─── Responsive ─── */
-@media (max-width: 768px) {
-  .hero { padding: 7rem 0 4rem; }
-  .agents-grid { grid-template-columns: 1fr; }
-  .stats-row { grid-template-columns: repeat(3, 1fr); }
-  .workflow-flow { flex-direction: column; padding: 1.25rem; }
-  .flow-arrow { transform: rotate(90deg); }
-  nav { padding: 0 1rem; }
-  .nav-links { gap: 0.75rem; }
-  .nav-links a { font-size: 0.75rem; }
-}
-@media (max-width: 480px) {
-  .stats-row { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
-  .stat-card { padding: 1rem 0.5rem; }
-  .stat-value { font-size: 1.4rem; }
-  .stat-label { font-size: 0.65rem; }
-  .container { padding: 0 1rem; }
-}
-
-/* ─── Animations ─── */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.fade-up {
-  opacity: 0; animation: fadeUp 0.6s ease forwards;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-.fade-up:nth-child(2) { animation-delay: 0.1s; }
-.fade-up:nth-child(3) { animation-delay: 0.2s; }
-.fade-up:nth-child(4) { animation-delay: 0.3s; }
 
-/* ─── Workflow tab content hide/show ─── */
-.workflow-panel { display: none; }
-.workflow-panel.active { display: block; }
+@media (max-width: 640px) {
+  .hero { padding: 5.75rem 0 2.5rem; }
+  .container { padding: 0 1rem; }
+  .nav-links {
+    display: none; position: absolute; top: 52px; left: 0; right: 0;
+    background: var(--bg-2); border-bottom: 1px solid var(--border);
+    flex-direction: column; padding: 0.75rem; gap: 0.25rem;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a { width: 100%; padding: 0.6rem 0.75rem; }
+  .nav-toggle { display: block; }
+  .flow-viz { flex-direction: column; align-items: stretch; }
+  .flow-arrow { text-align: center; }
+  .gates-interactive { flex-direction: column; }
+}
 </style>
 </head>
 <body>
 
-<!-- ─── Nav ─── -->
 <nav>
   <div class="nav-logo">ai<span>ops</span></div>
-  <div class="nav-links">
-    <a href="#workflows">Workflows</a>
-    <a href="#agents">Agents</a>
-    <a href="#skills">Skills</a>
-    <a href="#ides">IDEs</a>
-    <a href="https://github.com/yugasun/aiops" target="_blank">GitHub ↗</a>
+  <button class="nav-toggle" id="navToggle" aria-label="菜单">菜单</button>
+  <div class="nav-links" id="navLinks">
+    <a href="#start">怎么用</a>
+    <a href="#examples">示例</a>
+    <a href="#flows">路径</a>
+    <a href="#gates">质量门</a>
+    <a href="#install">安装</a>
+    <a href="https://github.com/yugasun/aiops" target="_blank" rel="noopener">GitHub</a>
   </div>
 </nav>
 
-<!-- ─── Main ─── -->
 <main>
 <div class="container">
+
 <section class="hero">
-  <div class="hero-badge fade-up">
-    <span class="dot"></span>
-    <span>9 agents · 20 skills · 6 IDEs</span>
-    
-  </div>
+  <div class="hero-glow"></div>
+  <div class="hero-tag">一条命令 · 6 个 AI IDE</div>
+  <h1>在聊天里输入 <span class="accent">/aiops</span><br>剩下的跟着步骤走</h1>
+  <p class="hero-lead">不用记技能名，不用懂 agent。用中文说你想做什么，AI 按「第几步」带你对齐、实现、过质量门——只有你点头才提交。</p>
 
-  <h1 class="fade-up">
-    <span class="dim">align.</span> design. <span class="accent">implement.</span> ship.
-  </h1>
-
-  <p class="hero-sub fade-up">
-    <span>AI-powered agile dev workflow. 9 specialized agents collaborate through artifact contracts — each handoff produces reviewable artifacts, each gate blocks until quality passes. From alignment to commit, across 6 AI IDEs.</span>
-    
-  </p>
-
-  <div class="hero-ctas fade-up">
-    <a href="https://github.com/yugasun/aiops" class="btn btn-primary" target="_blank">
-      <span>⭐</span>
-      <span>GitHub</span>
-      
-    </a>
-    <a href="#install" class="btn btn-secondary">
-      <span>Install →</span>
-      
-    </a>
-  </div>
-
-  <div class="install-bar fade-up" id="install">
-    <div class="install-bar-header">
-      <div class="dots"><span></span><span></span><span></span></div>
-      <span>terminal</span>
+  <div class="terminal" id="heroTerminal">
+    <div class="terminal-bar">
+      <div class="terminal-dots"><span></span><span></span><span></span></div>
+      <span>Cursor / Claude Code</span>
     </div>
-    <code><span class="prompt">$</span> npx -y github:yugasun/aiops</code>
+    <div class="terminal-body">
+      <div class="terminal-prompt">聊天框输入 ↓</div>
+      <div class="terminal-input" id="heroCmd">/aiops 我想加一个健康检查接口</div>
+      <div class="terminal-hint" id="heroHint">隔天继续：<code style="color:var(--green)">/aiops 继续</code></div>
+      <div class="terminal-actions">
+        <button type="button" class="btn btn-sm" id="heroCopy">复制</button>
+        <button type="button" class="btn btn-sm" id="heroRotate">换一句示例</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <a href="#install" class="btn btn-primary">安装</a>
+    <a href="#examples" class="btn btn-ghost">看示例</a>
+    <a href="https://github.com/yugasun/aiops" class="btn btn-ghost" target="_blank" rel="noopener">GitHub</a>
   </div>
 </section>
 
-<!-- ─── Agent Dispatch Workflows ─── -->
-<section id="workflows">
-  <div class="section-label">Agent dispatch workflows</div>
-  <div class="section-title">How agents collaborate.</div>
-  <div class="section-desc">
-    The Router (<code>/aiops</code>) picks the task type and dispatches agents in sequence. Each agent reads upstream artifacts, does its job, and hands off to the next.
-  </div>
+<section id="start">
+  <div class="section-label">快速开始</div>
+  <div class="section-title">三步就能开工</div>
+  <p class="section-desc">零配置默认：本地 markdown 记任务。点下面每一步看说明。</p>
 
-  <div class="workflow-tabs" id="workflowTabs">
-    <button class="workflow-tab active" data-flow="feature">Feature</button>
-    <button class="workflow-tab" data-flow="feature-ui">Feature + UI</button>
-    <button class="workflow-tab" data-flow="bug">Bug</button>
-    <button class="workflow-tab" data-flow="prototype">Prototype</button>
-    <button class="workflow-tab" data-flow="arch-health">Architecture</button>
-  </div>
-
-  <div class="workflow-panel active" id="panel-feature">
-    <div class="workflow-flow">
-      <div class="flow-agent role-alignment">
-        <div class="flow-agent-name">architect</div>
-        <div class="flow-agent-role">alignment</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-design-gate">
-        <div class="flow-agent-name">design-reviewer</div>
-        <div class="flow-agent-role">design gate</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-planning">
-        <div class="flow-agent-name">planner</div>
-        <div class="flow-agent-role">planning</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-delivery">
-        <div class="flow-agent-name">builder</div>
-        <div class="flow-agent-role">delivery</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-delivery-gate">
-        <div class="flow-agent-name">code-reviewer</div>
-        <div class="flow-agent-role">review gate</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-delivery-gate">
-        <div class="flow-agent-name">quality-auditor</div>
-        <div class="flow-agent-role">prune gate</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-delivery">
-        <div class="flow-agent-name">gitops</div>
-        <div class="flow-agent-role">commit</div>
+  <div class="steps-grid" id="stepsGrid">
+    <div class="step-item active" data-step="0">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">安装到 AI IDE</div>
+        <div class="step-body">终端一行命令，支持 Cursor、Claude Code、Codex、Copilot、Windsurf。装完重启 IDE。</div>
       </div>
     </div>
-    <div class="workflow-desc">
-      Standard feature delivery: align on design → <strong>design review gate</strong> → plan tasks → build with TDD → review → prune bloat → commit.
+    <div class="step-item" data-step="1">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">打开项目，输入 <code>/aiops</code></div>
+        <div class="step-body">中文描述目标即可，例如「修登录 500」「给后台加导出」。不用写 Task type。</div>
+      </div>
+    </div>
+    <div class="step-item" data-step="2">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">跟着「第 N 步」走</div>
+        <div class="step-body">进度在 <code>.scratch/&lt;功能名&gt;/flow.state.yaml</code>，下次 <code>/aiops 继续</code> 接着做。</div>
+      </div>
     </div>
   </div>
 
-  <div class="workflow-panel" id="panel-feature-ui">
-    <div class="workflow-flow">
-      <div class="flow-agent role-alignment">
-        <div class="flow-agent-name">architect</div>
-        <div class="flow-agent-role">alignment</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-design">
-        <div class="flow-agent-name">ui-designer</div>
-        <div class="flow-agent-role">design</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-design-gate">
-        <div class="flow-agent-name">design-reviewer</div>
-        <div class="flow-agent-role">design gate</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-planning">
-        <div class="flow-agent-name">planner</div>
-        <div class="flow-agent-role">planning</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-delivery">
-        <div class="flow-agent-name">builder</div>
-        <div class="flow-agent-role">delivery</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-delivery-gate">
-        <div class="flow-agent-name">code-reviewer</div>
-        <div class="flow-agent-role">review gate</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-delivery-gate">
-        <div class="flow-agent-name">quality-auditor</div>
-        <div class="flow-agent-role">prune gate</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-delivery">
-        <div class="flow-agent-name">gitops</div>
-        <div class="flow-agent-role">commit</div>
-      </div>
+  <div class="narration-live" id="narrationLive">
+    <div class="narration-step-line" id="narrationTitle">第 1/3 步 · 安装 <em>(Install)</em></div>
+    <p id="narrationBody">在终端运行安装命令，重启 IDE 后即可在聊天框使用 <code>/aiops</code>。</p>
+    <div class="narration-btns">
+      <button type="button" data-narration="continue">[继续]</button>
+      <button type="button" data-narration="pause">[暂停，下次再说]</button>
     </div>
-    <div class="workflow-desc">
-      UI-heavy features: architect defines the design constraints, ui-designer produces mockups, design-reviewer validates both, then planner breaks down the work.
-    </div>
-  </div>
-
-  <div class="workflow-panel" id="panel-bug">
-    <div class="workflow-flow">
-      <div class="flow-agent role-delivery">
-        <div class="flow-agent-name">builder</div>
-        <div class="flow-agent-role">diagnose + fix</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-delivery-gate">
-        <div class="flow-agent-name">code-reviewer</div>
-        <div class="flow-agent-role">review gate</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-delivery">
-        <div class="flow-agent-name">gitops</div>
-        <div class="flow-agent-role">commit</div>
-      </div>
-    </div>
-    <div class="workflow-desc">
-      Bug fixes skip planning: diagnose with <code>/diagnosing-bugs</code>, fix with TDD, review, commit. Quality auditor is skipped for bug fixes.
-    </div>
-  </div>
-
-  <div class="workflow-panel" id="panel-prototype">
-    <div class="workflow-flow">
-      <div class="flow-agent role-prototype">
-        <div class="flow-agent-name">prototyper</div>
-        <div class="flow-agent-role">standalone</div>
-      </div>
-    </div>
-    <div class="workflow-desc">
-      Prototyper runs standalone — rapid validation with throwaway code. Outputs a <code>VERDICT.md</code> (FEASIBLE / NOT FEASIBLE) that feeds back to architect.
-    </div>
-  </div>
-
-  <div class="workflow-panel" id="panel-arch-health">
-    <div class="workflow-flow">
-      <div class="flow-agent role-alignment">
-        <div class="flow-agent-name">architect</div>
-        <div class="flow-agent-role">scan + design</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-design-gate">
-        <div class="flow-agent-name">design-reviewer</div>
-        <div class="flow-agent-role">design gate</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-planning">
-        <div class="flow-agent-name">planner</div>
-        <div class="flow-agent-role">planning</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-delivery">
-        <div class="flow-agent-name">builder</div>
-        <div class="flow-agent-role">implement</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-delivery-gate">
-        <div class="flow-agent-name">code-reviewer</div>
-        <div class="flow-agent-role">review gate</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-delivery-gate">
-        <div class="flow-agent-name">quality-auditor</div>
-        <div class="flow-agent-role">prune gate</div>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-agent role-delivery">
-        <div class="flow-agent-name">gitops</div>
-        <div class="flow-agent-role">commit</div>
-      </div>
-    </div>
-    <div class="workflow-desc">
-      Architecture health: <code>/improve-codebase-architecture</code> scans for deepening opportunities, architect designs fixes, design-reviewer validates, planner creates issues, builder implements with full gate chain.
-    </div>
+    <div class="progress-bar"><div class="progress-fill" id="stepProgress"></div></div>
   </div>
 </section>
 
-<!-- ─── Agents ─── -->
-<section id="agents">
-  <div class="section-label">Specialized agents</div>
-  <div class="section-title">9 agents. Each with identity, skills, and artifact contracts.</div>
-  <div class="section-desc">
-    Agents are <strong>nouns</strong> (who does it). Skills are <strong>verbs</strong> (what to do). Each agent wraps skills with identity, constraints, and defined outputs. They communicate through <code>.scratch/&lt;feature&gt;/</code> artifact files.
-  </div>
+<section id="examples">
+  <div class="section-label">Use cases</div>
+  <div class="section-title">一个区域，切换不同场景</div>
+  <p class="section-desc">选中标签查看完整话术与预期结果，点复制粘贴到 IDE 聊天框即可。</p>
 
-  <div class="agents-grid">
-    <!-- architect -->
-    <div class="agent-card role-alignment">
-      <div class="agent-card-header">
-        <div class="agent-card-name">architect</div>
-        <div class="agent-card-role role-badge-alignment">alignment</div>
-      </div>
-      <div class="agent-card-desc">
-        Design decisions and tech specs. Explores the problem space, scans existing architecture for deepening opportunities, models the domain. Does not write implementation code.
-      </div>
-      <div class="agent-card-skills">
-        <span class="skill-pill">/grilling</span>
-        <span class="skill-pill">/grill-with-docs</span>
-        <span class="skill-pill">/domain-modeling</span>
-        <span class="skill-pill">/architect-design</span>
-        <span class="skill-pill">/improve-codebase-architecture</span>
-      </div>
-      <div class="agent-card-outputs">
-        → <span>NOTES.md</span> · <span>tech-spec.md</span>
-      </div>
+  <div class="card">
+    <div style="padding: 0.85rem 0.85rem 0; border-bottom: 1px solid var(--border);">
+      <div class="tab-bar scrollable" id="useCaseTabs" role="tablist"></div>
     </div>
-
-    <!-- design-reviewer -->
-    <div class="agent-card role-design-gate">
-      <div class="agent-card-header">
-        <div class="agent-card-name">design-reviewer</div>
-        <div class="agent-card-role role-badge-design-gate">design gate</div>
-      </div>
-      <div class="agent-card-desc">
-        Independent review of architect's design. Checks design soundness, depth, seam placement, and alignment with domain model. Strong gate — blocks planner until APPROVE.
-      </div>
-      <div class="agent-card-skills">
-        <span class="skill-pill">/review</span>
-      </div>
-      <div class="agent-card-outputs">
-        → <span>DESIGN_REVIEW.md</span>
-      </div>
-    </div>
-
-    <!-- planner -->
-    <div class="agent-card role-planning">
-      <div class="agent-card-header">
-        <div class="agent-card-name">planner</div>
-        <div class="agent-card-role role-badge-planning">planning</div>
-      </div>
-      <div class="agent-card-desc">
-        Breaks design into vertical slices. Synthesizes PRDs, creates implementation plans with clear acceptance criteria. Manages dependencies between issues.
-      </div>
-      <div class="agent-card-skills">
-        <span class="skill-pill">/to-prd</span>
-        <span class="skill-pill">/to-issues</span>
-        <span class="skill-pill">/handoff</span>
-        <span class="skill-pill">/aiops-setup</span>
-      </div>
-      <div class="agent-card-outputs">
-        → <span>PRD.md</span> · <span>plan.md</span> · <span>issues/</span>
-      </div>
-    </div>
-
-    <!-- prototyper -->
-    <div class="agent-card role-prototype">
-      <div class="agent-card-header">
-        <div class="agent-card-name">prototyper</div>
-        <div class="agent-card-role role-badge-prototype">prototype</div>
-      </div>
-      <div class="agent-card-desc">
-        Rapid validation with throwaway code. Answers "can this work?" in minimal time. Not concerned with code quality — only feasibility.
-      </div>
-      <div class="agent-card-skills">
-        <span class="skill-pill">/prototype</span>
-        <span class="skill-pill">/lean</span>
-      </div>
-      <div class="agent-card-outputs">
-        → <span>VERDICT.md</span> · <span>prototype/</span>
-      </div>
-    </div>
-
-    <!-- builder -->
-    <div class="agent-card role-delivery">
-      <div class="agent-card-header">
-        <div class="agent-card-name">builder</div>
-        <div class="agent-card-role role-badge-delivery">delivery</div>
-      </div>
-      <div class="agent-card-desc">
-        TDD implementation with hard quality gates. Follows the lean→tdd→prune→review→commit sequence. One issue at a time, no premature abstraction.
-      </div>
-      <div class="agent-card-skills">
-        <span class="skill-pill">/aiops-implement</span>
-        <span class="skill-pill">/tdd</span>
-        <span class="skill-pill">/lean</span>
-      </div>
-      <div class="agent-card-outputs">
-        → <span>source code + tests</span>
-        
-      </div>
-    </div>
-
-    <!-- ui-designer -->
-    <div class="agent-card role-design">
-      <div class="agent-card-header">
-        <div class="agent-card-name">ui-designer</div>
-        <div class="agent-card-role role-badge-design">design</div>
-      </div>
-      <div class="agent-card-desc">
-        Visual reference without business logic. Produces browser-openable HTML mockups with design decisions documented. No JS event handlers, no build step.
-      </div>
-      <div class="agent-card-skills">
-        <span class="skill-pill">/ui-mockup</span>
-      </div>
-      <div class="agent-card-outputs">
-        → <span>mockups/</span> · <span>design-notes.md</span>
-      </div>
-    </div>
-
-    <!-- code-reviewer -->
-    <div class="agent-card role-delivery-gate">
-      <div class="agent-card-header">
-        <div class="agent-card-name">code-reviewer</div>
-        <div class="agent-card-role role-badge-gate">delivery gate</div>
-      </div>
-      <div class="agent-card-desc">
-        Independent review against design intent. Checks correctness, security, and alignment with NOTES.md. Distinguishes blocking from non-blocking findings.
-      </div>
-      <div class="agent-card-skills">
-        <span class="skill-pill">/review</span>
-      </div>
-      <div class="agent-card-outputs">
-        → <span>REVIEW.md</span>
-      </div>
-    </div>
-
-    <!-- quality-auditor -->
-    <div class="agent-card role-delivery-gate">
-      <div class="agent-card-header">
-        <div class="agent-card-name">quality-auditor</div>
-        <div class="agent-card-role role-badge-gate">delivery gate</div>
-      </div>
-      <div class="agent-card-desc">
-        Over-engineering detection. Finds unnecessary abstractions, premature optimization, and scope creep. Uses the lean ladder as the judgment standard. Runs only after code-reviewer approves.
-      </div>
-      <div class="agent-card-skills">
-        <span class="skill-pill">/prune</span>
-      </div>
-      <div class="agent-card-outputs">
-        → <span>prune findings</span>
-        
-      </div>
-    </div>
-
-    <!-- gitops -->
-    <div class="agent-card role-delivery">
-      <div class="agent-card-header">
-        <div class="agent-card-name">gitops</div>
-        <div class="agent-card-role role-badge-delivery">delivery</div>
-      </div>
-      <div class="agent-card-desc">
-        Version control operator. Commits with Conventional Commits format, traces back to .scratch artifacts. Does not modify code — only git operations.
-      </div>
-      <div class="agent-card-skills">
-        <span class="skill-pill">/gitops</span>
-      </div>
-      <div class="agent-card-outputs">
-        → <span>commit + push</span>
-        
-      </div>
-    </div>
+    <div id="useCasePanels"></div>
   </div>
 </section>
 
-<!-- ─── Skills overview ─── -->
-<section id="skills">
-  <div class="section-label">Skills overview</div>
-  <div class="section-title">20 skills. Each used by one or more agents.</div>
-  <div class="section-desc">
-    Skills are the <strong>verbs</strong> of the system. Agents invoke them during execution. Some skills (like <code>/lean</code>) are used by multiple agents. Others are agent-specific.
+<section id="flows">
+  <div class="section-label">路径</div>
+  <div class="section-title">你说什么，走哪条路</div>
+  <p class="section-desc">Flow Conductor 在内部调度技能与 agent，对外只显示人话步骤。</p>
+
+  <div class="tab-bar" id="flowTabs" role="tablist">
+    <button type="button" class="tab-btn active" data-flow="feature">新功能</button>
+    <button type="button" class="tab-btn" data-flow="bug">修 Bug</button>
+    <button type="button" class="tab-btn" data-flow="arch">优化存量</button>
+    <button type="button" class="tab-btn" data-flow="multi">大功能 · 多会话</button>
   </div>
 
-  <div class="skills-table-wrap">
-    <table class="skills-table">
-      <thead>
-        <tr>
-          <th>Skill</th>
-          <th>Layer</th>
-          <th>Role</th>
-          <th>Used by</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="layer-head"><td colspan="4"><span>Router</span></td></tr>
-        <tr>
-          <td><code>/aiops</code></td>
-          <td><span>Router</span></td>
-          <td><span>Entry point, dispatches agents</span></td>
-          <td><div class="skill-used-by"><code>user</code></div></td>
-        </tr>
-        <tr class="layer-head"><td colspan="4"><span>Setup</span></td></tr>
-        <tr>
-          <td><code>/aiops-setup</code></td>
-          <td><span>Setup</span></td>
-          <td><span>Project config, issue tracker, domain docs</span></td>
-          <td><div class="skill-used-by"><code>planner</code></div></td>
-        </tr>
-        <tr class="layer-head"><td colspan="4"><span>Alignment</span></td></tr>
-        <tr>
-          <td><code>/grilling</code></td>
-          <td><span>Alignment</span></td>
-          <td><span>Interview loop, exposes assumptions</span></td>
-          <td><div class="skill-used-by"><code>architect</code></div></td>
-        </tr>
-        <tr>
-          <td><code>/grill-with-docs</code></td>
-          <td><span>Alignment</span></td>
-          <td><span>Grill with domain docs and ADRs</span></td>
-          <td><div class="skill-used-by"><code>architect</code></div></td>
-        </tr>
-        <tr>
-          <td><code>/domain-modeling</code></td>
-          <td><span>Alignment</span></td>
-          <td><span>Glossary + ADR discipline</span></td>
-          <td><div class="skill-used-by"><code>architect</code></div></td>
-        </tr>
-        <tr>
-          <td><code>/architect-design</code></td>
-          <td><span>Alignment</span></td>
-          <td><span>Structured design process: constraints → modules → seams → Design It Twice</span></td>
-          <td><div class="skill-used-by"><code>architect</code></div></td>
-        </tr>
-        <tr class="layer-head"><td colspan="4"><span>Planning</span></td></tr>
-        <tr>
-          <td><code>/to-prd</code></td>
-          <td><span>Planning</span></td>
-          <td><span>Conversation → PRD</span></td>
-          <td><div class="skill-used-by"><code>planner</code></div></td>
-        </tr>
-        <tr>
-          <td><code>/to-issues</code></td>
-          <td><span>Planning</span></td>
-          <td><span>PRD → vertical slices</span></td>
-          <td><div class="skill-used-by"><code>planner</code></div></td>
-        </tr>
-        <tr>
-          <td><code>/handoff</code></td>
-          <td><span>Planning</span></td>
-          <td><span>Cross-session context compaction</span></td>
-          <td><div class="skill-used-by"><code>planner</code></div></td>
-        </tr>
-        <tr class="layer-head"><td colspan="4"><span>Delivery</span></td></tr>
-        <tr>
-          <td><code>/aiops-implement</code></td>
-          <td><span>Delivery</span></td>
-          <td><span>Delivery overlay, gates sequence</span></td>
-          <td><div class="skill-used-by"><code>builder</code></div></td>
-        </tr>
-        <tr>
-          <td><code>/tdd</code></td>
-          <td><span>Delivery</span></td>
-          <td><span>Test-driven development</span></td>
-          <td><div class="skill-used-by"><code>builder</code></div></td>
-        </tr>
-        <tr>
-          <td><code>/lean</code></td>
-          <td><span>Delivery</span></td>
-          <td><span>YAGNI ladder, min code discipline</span></td>
-          <td><div class="skill-used-by"><code>builder</code><code>prototyper</code></div></td>
-        </tr>
-        <tr>
-          <td><code>/review</code></td>
-          <td><span>Delivery</span></td>
-          <td><span>Code review against spec</span></td>
-          <td><div class="skill-used-by"><code>code-reviewer</code></div></td>
-        </tr>
-        <tr>
-          <td><code>/prune</code></td>
-          <td><span>Delivery</span></td>
-          <td><span>Over-engineering gate</span></td>
-          <td><div class="skill-used-by"><code>quality-auditor</code></div></td>
-        </tr>
-        <tr>
-          <td><code>/gitops</code></td>
-          <td><span>Delivery</span></td>
-          <td><span>Git operations</span></td>
-          <td><div class="skill-used-by"><code>gitops</code></div></td>
-        </tr>
-        <tr class="layer-head"><td colspan="4"><span>Other paths</span></td></tr>
-        <tr>
-          <td><code>/diagnosing-bugs</code></td>
-          <td><span>Bug</span></td>
-          <td><span>Bug diagnosis and root cause</span></td>
-          <td><div class="skill-used-by"><code>builder</code></div></td>
-        </tr>
-        <tr>
-          <td><code>/triage</code></td>
-          <td><span>Incoming</span></td>
-          <td><span>Incoming request state machine</span></td>
-          <td><div class="skill-used-by"><code>router</code></div></td>
-        </tr>
-        <tr>
-          <td><code>/prototype</code></td>
-          <td><span>Prototype</span></td>
-          <td><span>Rapid prototype construction</span></td>
-          <td><div class="skill-used-by"><code>prototyper</code></div></td>
-        </tr>
-        <tr>
-          <td><code>/ui-mockup</code></td>
-          <td><span>Design</span></td>
-          <td><span>HTML/CSS mockup generation</span></td>
-          <td><div class="skill-used-by"><code>ui-designer</code></div></td>
-        </tr>
-        <tr>
-          <td><code>/improve-codebase-architecture</code></td>
-          <td><span>Architecture</span></td>
-          <td><span>Scan for shallow modules, leaked seams</span></td>
-          <td><div class="skill-used-by"><code>architect</code></div></td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="card">
+    <div class="flow-viz" id="flowViz"></div>
+    <div class="flow-desc" id="flowDesc"></div>
   </div>
 </section>
 
-<!-- ─── Delivery discipline (compact) ─── -->
-<section id="delivery">
-  <div class="section-label">Inside the builder</div>
-  <div class="section-title">Delivery hard gates.</div>
+<section id="gates">
+  <div class="section-label">质量</div>
+  <div class="section-title">实现阶段的五道门</div>
+  <p class="section-desc">点每一步看说明。顺序固定，<strong>只有你明确要求才会 commit</strong>。</p>
 
-  <div class="delivery-section">
-    <div>
-      <div class="section-desc" style="margin-bottom: 1.5rem;">
-        When the <strong>builder</strong> agent runs, every change passes through five sequential gates. No gate can be skipped. Commit only happens on your approval.
-      </div>
+  <div class="gates-interactive" id="gateBtns"></div>
+  <div class="gate-detail" id="gateDetail"></div>
+  <p class="flow-desc" style="margin-top: 1rem; padding: 0;">对齐、讨论需求时不启用「最小代码」模式。</p>
+</section>
 
-      <div class="gate-flow">
-        <div class="gate-step">🪜 lean</div>
-        <div class="gate-arrow">→</div>
-        <div class="gate-step">🧪 tdd</div>
-        <div class="gate-arrow">→</div>
-        <div class="gate-step">✂️ prune</div>
-        <div class="gate-arrow">→</div>
-        <div class="gate-step">🔍 review</div>
-        <div class="gate-arrow">→</div>
-        <div class="gate-step">🚀 commit</div>
-      </div>
+<section id="install">
+  <div class="section-label">安装</div>
+  <div class="section-title">一行命令</div>
 
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-value">6</div>
-          <div class="stat-label">IDEs supported</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">20</div>
-          <div class="stat-label">Tier 1 skills</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">9</div>
-          <div class="stat-label">Agents</div>
-        </div>
-      </div>
-    </div>
+  <div class="card install-block">
+    <div class="install-header"><span>推荐</span><button type="button" class="btn btn-sm cmd-copy-btn" data-copy="npx -y github:yugasun/aiops">复制</button></div>
+    <div class="install-code"><span><span class="prompt">$</span> npx -y github:yugasun/aiops</span></div>
+  </div>
+  <div class="card install-block">
+    <div class="install-header"><span>Skills CLI 全局</span><button type="button" class="btn btn-sm cmd-copy-btn" data-copy="npx skills@latest add yugasun/aiops -g -y --skill '*'">复制</button></div>
+    <div class="install-code"><span><span class="prompt">$</span> npx skills@latest add yugasun/aiops -g -y --skill '*'</span></div>
+  </div>
 
-    <div>
-      <div class="ladder-compact">
-        <div class="ladder-title">YAGNI ladder (lean discipline)</div>
-        <div class="ladder-item">
-          <div class="num">1</div>
-          <span>Does this need to exist? (YAGNI)</span>
-          
-        </div>
-        <div class="ladder-item">
-          <div class="num">2</div>
-          <span>Stdlib does it?</span>
-          
-        </div>
-        <div class="ladder-item">
-          <div class="num">3</div>
-          <span>Native platform feature?</span>
-          
-        </div>
-        <div class="ladder-item">
-          <div class="num">4</div>
-          <span>Already-installed dependency?</span>
-          
-        </div>
-        <div class="ladder-item">
-          <div class="num">5</div>
-          <span>One line?</span>
-          
-        </div>
-        <div class="ladder-item">
-          <div class="num">6</div>
-          <span>Minimum code that works</span>
-          
-        </div>
-        <div class="ladder-note">
-          Auto-injected into every coding turn on Cursor, Copilot, and Windsurf. Available on-demand via <code>/lean</code> for Claude Code and Codex.
-        </div>
-        <div class="ladder-note" style="margin-top: 0.4rem;">
-          Lean is <strong>only active during delivery</strong> — off during grill/alignment and planning.
-        </div>
-      </div>
-    </div>
+  <div class="card config-card">
+    <h3>可选：团队用 GitHub / GitLab</h3>
+    <p>默认任务记在 <code>.scratch/</code>。只有需要远程 issue 时，在项目根加 <code>aiops.yaml</code>：</p>
+    <pre>version: 1
+issue_tracker:
+  kind: github
+  prs_as_triage: false</pre>
+    <p style="margin:0;font-size:0.82rem;color:var(--text-muted)">没有 yaml = 本地 markdown，首次 <code>/aiops</code> 不问卷。</p>
   </div>
 </section>
 
-<!-- ─── IDEs ─── -->
 <section id="ides">
-  <div class="section-label">Multi-IDE portability</div>
-  <div class="section-title">One source. Every IDE.</div>
-  <div class="section-desc">
-    The adapter seam compiles <code>SKILL.md</code> to each IDE's native format at install time. Zero drift between platforms. Adding a new IDE = writing one adapter file.
-  </div>
-
-  <div class="ide-matrix">
+  <div class="section-label">兼容性</div>
+  <div class="section-title">支持的 AI IDE</div>
+  <div class="card ide-table-wrap" style="padding: 0;">
     <table class="ide-table">
-      <thead>
-        <tr>
-          <th>IDE</th>
-          <th>Skills</th>
-          <th>Always-On</th>
-          <th>Agents</th>
-          <th>Hooks</th>
-        </tr>
-      </thead>
+      <thead><tr><th>IDE</th><th>技能目录</th><th>Lean</th></tr></thead>
       <tbody>
-        <tr>
-          <td>Claude Code</td>
-          <td><code>.claude/skills/</code></td>
-          <td><span>via /lean</span></td>
-          <td><code>.claude/agents/</code></td>
-          <td><span class="badge-sm">SessionStart</span></td>
-        </tr>
-        <tr>
-          <td>Cursor</td>
-          <td><code>.cursor/skills/</code></td>
-          <td><code>.cursor/rules/lean.mdc</code></td>
-          <td><code>.cursor/agents/</code></td>
-          <td><span class="check">—</span></td>
-        </tr>
-        <tr>
-          <td>Codex CLI</td>
-          <td><code>.agents/skills/</code></td>
-          <td><span>via AGENTS.md</span></td>
-          <td><code>.codex/agents/</code> <span class="badge-sm">TOML</span></td>
-          <td><span class="check">—</span></td>
-        </tr>
-        <tr>
-          <td>Windsurf</td>
-          <td><code>.windsurf/skills/</code></td>
-          <td><code>.windsurf/rules/lean.mdc</code></td>
-          <td><code>.windsurf/agents/</code></td>
-          <td><span class="check">—</span></td>
-        </tr>
-        <tr>
-          <td>Copilot</td>
-          <td><code>.github/skills/</code></td>
-          <td><code>copilot-instructions.md</code></td>
-          <td><code>.github/agents/</code></td>
-          <td><span class="check">—</span></td>
-        </tr>
-        <tr>
-          <td>Generic</td>
-          <td>—</td>
-          <td><code>AGENTS.md</code></td>
-          <td>—</td>
-          <td><span class="check">—</span></td>
-        </tr>
+        <tr><td>Cursor</td><td><code>.cursor/skills/</code></td><td>自动 rules</td></tr>
+        <tr><td>Claude Code</td><td><code>.claude/skills/</code></td><td><code>/lean</code></td></tr>
+        <tr><td>Codex CLI</td><td><code>.agents/skills/</code></td><td><code>AGENTS.md</code></td></tr>
+        <tr><td>Copilot</td><td><code>.github/skills/</code></td><td>instructions</td></tr>
+        <tr><td>Windsurf</td><td><code>.windsurf/skills/</code></td><td>自动 rules</td></tr>
       </tbody>
     </table>
   </div>
+
+  <details class="card advanced">
+    <summary>想了解底层？9 agent · 20 skill</summary>
+    <div class="inner">
+      <p>普通用户只需 <code>/aiops</code>；专家可 <code>/aiops architect …</code> 直接指定。</p>
+      <ul>
+        <li><a href="https://github.com/yugasun/aiops/blob/main/docs/agent-registry.md">Agent 注册表</a></li>
+        <li><a href="https://github.com/yugasun/aiops/blob/main/docs/skill-registry.md">Skill 注册表</a></li>
+        <li><a href="https://github.com/yugasun/aiops/blob/main/docs/getting-started.md">详细文档</a></li>
+      </ul>
+    </div>
+  </details>
 </section>
 
-<!-- ─── CTA ─── -->
-<section style="text-align: center; padding: 4rem 0 6rem;">
-  <div class="section-title" style="font-size: 1.5rem;">Ready to ship with discipline?</div>
-  <div class="install-bar" style="margin: 2rem auto 0;">
-    <div class="install-bar-header">
-      <div class="dots"><span></span><span></span><span></span></div>
-      <span>terminal</span>
+<section style="text-align:center;padding:2.5rem 0 3.5rem;">
+  <div class="section-title" style="font-size:1.2rem;">打开项目，试一句</div>
+  <div class="terminal" style="max-width:420px;margin:1rem auto 0;">
+    <div class="terminal-body" style="padding:0.85rem 1rem;">
+      <div class="terminal-input" style="font-size:0.88rem;">/aiops 我想做 …</div>
     </div>
-    <code><span class="prompt">$</span> npx -y github:yugasun/aiops</code>
   </div>
-  <p style="margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-dim);">
-    <span>Apache 2.0 · <a href="https://github.com/yugasun/aiops">GitHub</a> · <a href="https://github.com/yugasun/aiops/blob/main/docs/getting-started.md">Docs</a></span>
-    
-  </p>
 </section>
 
 </div>
-
 </main>
 
-<!-- ─── Footer ─── -->
 <footer>
   <div class="container">
     <div class="footer-links">
       <a href="https://github.com/yugasun/aiops">GitHub</a>
-      <a href="https://github.com/yugasun/aiops/blob/main/README.md">Docs</a>
+      <a href="https://github.com/yugasun/aiops/blob/main/docs/getting-started.md">文档</a>
       <a href="https://github.com/yugasun/aiops/blob/main/LICENSE">License</a>
-      <a href="https://github.com/yugasun/aiops/blob/main/CONTRIBUTING.md">Contributing</a>
     </div>
-    <div class="footer-copy">
-      <span>AI-powered agile dev workflow. Apache 2.0 · by <a href="https://github.com/yugasun" target="_blank">@yugasun</a></span>
-
-    </div>
+    <div class="footer-copy">Apache 2.0 · <a href="https://github.com/yugasun">@yugasun</a></div>
   </div>
 </footer>
 
 <script>
-// Workflow tab switcher
-document.getElementById('workflowTabs').addEventListener('click', function(e) {
-  if (!e.target.classList.contains('workflow-tab')) return;
-  var flow = e.target.getAttribute('data-flow');
+(function () {
+  /* ── Data ── */
+  var heroSamples = [
+    '/aiops 我想加一个健康检查接口',
+    '/aiops 登录从昨天部署后开始 500，帮我修',
+    '/aiops 继续',
+    '/aiops 帮我看看架构有哪些可以优化',
+    '/aiops 在后台加 CSV 导出页，先看界面草图'
+  ];
+  var heroHints = [
+    '隔天继续：<code style="color:var(--green)">/aiops 继续</code>',
+    'Bug 路径会跳过需求对齐',
+    '从 flow.state.yaml 恢复进度',
+    '会先出架构报告，你选一项再深化',
+    '带 UI 会先出 HTML 草图'
+  ];
+  var heroIdx = 0;
 
-  // Deactivate all tabs and panels
-  this.querySelectorAll('.workflow-tab').forEach(function(t) {
-    t.classList.remove('active');
+  var startSteps = [
+    { title: '第 1/3 步 · 安装', en: 'Install', body: '在终端运行安装命令，重启 IDE 后即可在聊天框使用 /aiops。', pct: 33 },
+    { title: '第 2/3 步 · 开聊', en: 'Start', body: '用中文说目标，不用记技能名。AI 会自动判断是新功能、Bug 还是优化存量。', pct: 66 },
+    { title: '第 3/3 步 · 跟着走', en: 'Follow', body: '界面会显示「第 N/M 步」，需要时点 [继续]。进度写入 flow.state.yaml。', pct: 100 }
+  ];
+
+  var useCases = [
+    {
+      id: 'health', label: '小功能', tag: '单次会话',
+      title: '给 API 加健康检查',
+      scenario: '小 HTTP 服务加 GET /health，返回 status 和版本号，不引入多余框架。',
+      cmd: '/aiops 加一个 health 接口，返回 JSON：status 和 app 版本号，版本从环境变量或 package 读',
+      outcome: '对齐 → 设计笔记 → 实现 + 集成测试 → 你确认后再 commit。',
+      meta: ['约 30 分钟', '默认单次聊完'],
+      flow: ['对齐', '设计', '设计评审', '实现', '提交']
+    },
+    {
+      id: 'bug', label: '修 Bug', tag: '诊断路径',
+      title: '上线后登录 500',
+      scenario: '昨天部署后登录报错，需要复现、定位、修掉。',
+      cmd: '/aiops 登录接口从昨天部署后开始 500，帮我定位并修复',
+      outcome: '复现步骤 + 根因 → 最小修复 + 测试 → 评审 → 你点头再提交。',
+      meta: ['跳过对齐', '走诊断'],
+      flow: ['定位', '实现+质量门', '提交']
+    },
+    {
+      id: 'ui', label: '带界面', tag: 'UI 草图',
+      title: '管理后台「导出 CSV」',
+      scenario: '先有界面草图再写代码，避免实现阶段反复改 UI。',
+      cmd: '/aiops 在管理后台加数据导出页：选日期范围、点导出、下载 CSV，先让我看下页面长什么样',
+      outcome: 'HTML 草图可浏览器预览 → 设计评审 → 实现导出逻辑。',
+      meta: ['mockups/', '含 UI'],
+      flow: ['对齐', 'UI 草图', '设计评审', '实现', '提交']
+    },
+    {
+      id: 'arch', label: '存量优化', tag: '架构健康',
+      title: '老项目架构瘦身',
+      scenario: '模块边界乱，系统性找可深化点，选一项再改。',
+      cmd: '/aiops 帮我看看这个仓库有哪些架构可以优化，技术债集中在路由和 service 层',
+      outcome: '架构报告（浏览器打开）→ 你选一项 → grill → 设计 → 实现。',
+      meta: ['先扫再选', '深化机会'],
+      flow: ['架构扫描', '对齐', '设计', '实现']
+    },
+    {
+      id: 'rbac', label: '大功能', tag: '多会话',
+      title: 'RBAC 权限系统',
+      scenario: 'API 鉴权 + 后台角色 + 审计日志，拆成多个 issue。',
+      cmd: '/aiops 做一套 RBAC：API 鉴权、管理后台角色配置、操作审计日志，比较大，拆成多个 issue 慢慢做',
+      outcome: 'PRD + issues/ → 每个 issue 新开会话实现。',
+      meta: ['多会话', '每 issue 一聊天'],
+      flow: ['对齐', 'PRD', '拆 issue', '逐条实现']
+    },
+    {
+      id: 'green', label: '从零', tag: '绿场',
+      title: '空仓库起 CLI 工具',
+      scenario: '还没有业务代码，从 grill 定技术栈和范围。',
+      cmd: '/aiops 我想做一个 CLI：把本地 markdown 笔记批量转成 HTML，单文件、无数据库',
+      outcome: '深度提问定范围 → 技术规格 → 小步实现。',
+      meta: ['grill 优先', '无代码库'],
+      flow: ['对齐', '设计', '实现']
+    },
+    {
+      id: 'resume', label: '接着做', tag: '可恢复',
+      title: '隔天继续',
+      scenario: '昨天对齐完了，今天接着写实现。',
+      cmd: '/aiops 继续',
+      outcome: '读取 flow.state.yaml，从当前「第 N 步」接着走。',
+      meta: ['flow.state.yaml', '不用重讲背景'],
+      flow: ['恢复进度', '继续当前步']
+    },
+    {
+      id: 'github', label: 'GitHub', tag: '需 yaml',
+      title: '处理攒着的 issue',
+      scenario: '项目根已配置 aiops.yaml（kind: github）。',
+      cmd: '/triage\n\n整理完后：\n/aiops 实现 #42，按 issue 里的验收标准做',
+      outcome: 'triage 写成 agent-ready brief → 实现 + 质量门 → 你确认后提交。',
+      meta: ['Incoming', 'aiops.yaml'],
+      flow: ['triage', '实现', '提交']
+    }
+  ];
+
+  var flows = {
+    feature: {
+      chips: ['对齐', '设计方案', '设计评审', '实现 + 质量门', '你确认后提交'],
+      desc: '默认单次会话，小改动一次聊完。大功能可拆 PRD + 多个 issue。'
+    },
+    bug: {
+      chips: ['定位问题', '实现 + 质量门', '你确认后提交'],
+      desc: '跳过需求对齐，先复现再修。'
+    },
+    arch: {
+      chips: ['架构扫描', '对齐所选项', '设计', '实现'],
+      desc: '先出报告，你选一项 deepening candidate 再深化。'
+    },
+    multi: {
+      chips: ['对齐', '写 PRD', '拆 issue', '每 issue 新聊天', '实现'],
+      desc: '适合跨 API、后台、审计等多模块需求。'
+    }
+  };
+
+  var gates = [
+    { name: '最小代码', desc: 'YAGNI ladder：stdlib 优先，最短可用 diff。对齐阶段不启用。' },
+    { name: '测试 TDD', desc: '在约定的公开接口上红绿重构，行为可验证。' },
+    { name: '精简 diff', desc: '砍掉过度工程，diff 更短再进入评审。' },
+    { name: '对照设计', desc: '对照 NOTES / tech-spec / issue 验收标准评审。' },
+    { name: '你点头提交', desc: '所有门通过后，只有你明确要求才会 commit / push。' }
+  ];
+
+  /* ── Helpers ── */
+  function copyText(text, btn) {
+    navigator.clipboard.writeText(text).then(function () {
+      if (!btn) return;
+      var orig = btn.textContent;
+      btn.textContent = '已复制';
+      btn.classList.add('copied');
+      setTimeout(function () { btn.textContent = orig; btn.classList.remove('copied'); }, 1600);
+    });
+  }
+
+  function initTabs(containerId, panelsId, items, renderPanel, onSelect) {
+    var tabBar = document.getElementById(containerId);
+    var panels = document.getElementById(panelsId);
+    items.forEach(function (item, i) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tab-btn' + (i === 0 ? ' active' : '');
+      btn.textContent = item.label;
+      btn.setAttribute('data-idx', i);
+      btn.setAttribute('role', 'tab');
+      tabBar.appendChild(btn);
+
+      var panel = document.createElement('div');
+      panel.className = 'tab-panel' + (i === 0 ? ' active' : '');
+      panel.setAttribute('data-idx', i);
+      panel.innerHTML = renderPanel(item);
+      panels.appendChild(panel);
+
+      btn.addEventListener('click', function () {
+        tabBar.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+        panels.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        panel.classList.add('active');
+        if (onSelect) onSelect(item, i);
+      });
+    });
+  }
+
+  function renderUsePanel(uc) {
+    var flowHtml = uc.flow.map(function (f) { return '<span>' + f + '</span>'; }).join('<span class="flow-arrow">→</span>');
+    var metaHtml = uc.meta.map(function (m) { return '<span>' + m + '</span>'; }).join('');
+    return '<div class="use-panel">' +
+      '<div class="use-header"><div class="use-tag">' + uc.tag + '</div><h3 class="use-title">' + uc.title + '</h3>' +
+      '<p class="use-scenario">' + uc.scenario + '</p></div>' +
+      '<div class="cmd-block"><button type="button" class="btn btn-sm cmd-copy cmd-copy-float">复制</button>' +
+      '<pre class="use-cmd-text">' + uc.cmd + '</pre></div>' +
+      '<div class="use-outcome"><strong>你会得到：</strong>' + uc.outcome +
+      '<div class="use-meta">' + metaHtml + '</div>' +
+      '<div class="use-mini-flow">' + flowHtml + '</div></div></div>';
+  }
+
+  /* ── Hero ── */
+  document.getElementById('heroRotate').addEventListener('click', function () {
+    heroIdx = (heroIdx + 1) % heroSamples.length;
+    document.getElementById('heroCmd').textContent = heroSamples[heroIdx];
+    document.getElementById('heroHint').innerHTML = heroHints[heroIdx];
   });
-  document.querySelectorAll('.workflow-panel').forEach(function(p) {
-    p.classList.remove('active');
+  document.getElementById('heroCopy').addEventListener('click', function () {
+    copyText(heroSamples[heroIdx], document.getElementById('heroCopy'));
   });
 
-  // Activate all tabs with this data-flow (EN + ZH buttons)
-  this.querySelectorAll('[data-flow="' + flow + '"]').forEach(function(t) {
-    t.classList.add('active');
+  /* ── Start steps ── */
+  var stepItems = document.querySelectorAll('.step-item');
+  var narrationTitle = document.getElementById('narrationTitle');
+  var narrationBody = document.getElementById('narrationBody');
+  var stepProgress = document.getElementById('stepProgress');
+
+  function setStartStep(idx) {
+    stepItems.forEach(function (el, i) {
+      el.classList.toggle('active', i === idx);
+    });
+    var s = startSteps[idx];
+    narrationTitle.innerHTML = s.title + ' <em>(' + s.en + ')</em>';
+    narrationBody.textContent = s.body;
+    stepProgress.style.width = s.pct + '%';
+  }
+  stepItems.forEach(function (el) {
+    el.addEventListener('click', function () {
+      setStartStep(parseInt(el.getAttribute('data-step'), 10));
+    });
   });
 
-  // Show matching panel
-  var panel = document.getElementById('panel-' + flow);
-  if (panel) panel.classList.add('active');
-});
-
-// Intersection Observer for scroll animations
-var observer = new IntersectionObserver(function(entries) {
-  entries.forEach(function(e) {
-    if (e.isIntersecting) {
-      e.target.style.opacity = '1';
-      e.target.style.transform = 'translateY(0)';
+  /* ── Use cases tabs ── */
+  initTabs('useCaseTabs', 'useCasePanels', useCases, renderUsePanel);
+  document.getElementById('useCasePanels').addEventListener('click', function (e) {
+    var btn = e.target.closest('.cmd-copy');
+    if (btn) {
+      var pre = btn.parentElement.querySelector('.use-cmd-text');
+      copyText(pre.textContent, btn);
     }
   });
-}, { threshold: 0.1 });
 
-document.querySelectorAll('.agent-card, .stat-card, .flow-agent').forEach(function(el) {
-  el.style.opacity = '0';
-  el.style.transform = 'translateY(16px)';
-  el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-  observer.observe(el);
-});
+  /* ── Flow tabs ── */
+  var flowViz = document.getElementById('flowViz');
+  var flowDesc = document.getElementById('flowDesc');
+
+  function renderFlow(key) {
+    var f = flows[key];
+    flowViz.innerHTML = f.chips.map(function (c, i) {
+      var arrow = i < f.chips.length - 1 ? '<span class="flow-arrow">→</span>' : '';
+      return '<span class="flow-chip">' + c + '</span>' + arrow;
+    }).join('');
+    flowDesc.textContent = f.desc;
+  }
+  renderFlow('feature');
+
+  document.getElementById('flowTabs').addEventListener('click', function (e) {
+    var btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    document.querySelectorAll('#flowTabs .tab-btn').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    renderFlow(btn.getAttribute('data-flow'));
+  });
+
+  /* ── Gates ── */
+  var gateBtns = document.getElementById('gateBtns');
+  var gateDetail = document.getElementById('gateDetail');
+  var activeGate = 0;
+
+  gates.forEach(function (g, i) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'gate-btn' + (i === 0 ? ' active' : '');
+    btn.innerHTML = '<span class="gate-idx">' + (i + 1) + '</span>' + g.name;
+    btn.addEventListener('click', function () {
+      activeGate = i;
+      gateBtns.querySelectorAll('.gate-btn').forEach(function (b, j) {
+        b.classList.toggle('active', j === i);
+        b.classList.toggle('done', j < i);
+      });
+      gateDetail.textContent = g.desc;
+    });
+    gateBtns.appendChild(btn);
+  });
+  gateDetail.textContent = gates[0].desc;
+
+  /* ── Install copy ── */
+  document.querySelectorAll('.cmd-copy-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      copyText(btn.getAttribute('data-copy'), btn);
+    });
+  });
+
+  /* ── Nav ── */
+  document.getElementById('navToggle').addEventListener('click', function () {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+
+  var navAnchors = document.querySelectorAll('.nav-links a[href^="#"]');
+  var sections = [];
+  navAnchors.forEach(function (a) {
+    var id = a.getAttribute('href').slice(1);
+    var sec = document.getElementById(id);
+    if (sec) sections.push({ el: sec, link: a });
+  });
+  window.addEventListener('scroll', function () {
+    var y = window.scrollY + 80;
+    var current = sections[0];
+    sections.forEach(function (s) {
+      if (s.el.offsetTop <= y) current = s;
+    });
+    navAnchors.forEach(function (a) { a.classList.remove('active'); });
+    if (current) current.link.classList.add('active');
+  }, { passive: true });
+
+  /* ── Scroll reveal ── */
+  var revealEls = document.querySelectorAll('.card, .step-item, .narration-live');
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.style.animation = 'fadeUp 0.5s ease both';
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  revealEls.forEach(function (el) { obs.observe(el); });
+})();
 </script>
-
 </body>
 </html>

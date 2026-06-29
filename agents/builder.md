@@ -18,6 +18,8 @@
 - `.scratch/<feature>/mockups/`（如有，来自 UI Designer）
 - `.scratch/<feature>/prototype/`（如有，来自 Prototyper）
 - 当前 issue 的描述和验收标准
+- 诊断结论（Bug 路径，来自 `/diagnosing-bugs`）
+- triage brief（Incoming 路径，来自 `/triage`）
 
 ## Outputs
 

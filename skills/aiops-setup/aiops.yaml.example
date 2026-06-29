@@ -1,0 +1,10 @@
+# Copy to repo root as aiops.yaml when you need GitHub/GitLab — omit file for local markdown defaults.
+version: 1
+
+issue_tracker:
+  kind: local          # local | github | gitlab
+  prs_as_triage: false
+
+# triage_labels: omitted → 1:1 canonical names (see triage-labels.md)
+# domain:
+#   layout: single

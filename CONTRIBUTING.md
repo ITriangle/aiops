@@ -11,7 +11,7 @@
    bash scripts/verify.sh           # fast, no npm
    ```
 
-5. Router changes: `scripts/lib/router.py` + `scripts/test_router.py`.
+5. Router changes: `scripts/lib/router.py` + `scripts/test_router.py` + `scripts/lib/flow_cli.py`.
 6. New skill references: update `docs/agents/skill-registry.md`.
 
 ## Skill authoring
@@ -23,4 +23,4 @@
 
 ## Docs
 
-User-facing: `README.md`, `docs/getting-started.md`. Domain: `CONTEXT.md`. Architecture: `docs/adr/`.
+User-facing: `README.md`（中文）, `docs/getting-started.zh-CN.md`, `README.en.md`, `docs/getting-started.md`. Domain: `CONTEXT.md`. Architecture: `docs/adr/`.
