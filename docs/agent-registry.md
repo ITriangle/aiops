@@ -1,12 +1,12 @@
 # Agent Registry
 
-Single reference for agents in the aiops bundle — their roles, skills, and artifact contracts.
+Reference for the phase owners behind the `/aiops` workflow: what each agent is responsible for, which skills it can use, and what artifacts it leaves behind.
 
 ## What is an Agent?
 
-Agents are specialized identities that wrap skills. **Skills are verbs** (what to do), **agents are nouns** (who does it, with what perspective and constraints).
+Agents are phase owners. They keep the work accountable by turning decisions into files that later phases can inspect.
 
-The Router (`/aiops`) dispatches agents based on task type. Users can also invoke agents directly:
+The router (`/aiops`) dispatches agents based on task type. Most users do not need to invoke agents directly, but it is supported:
 
 ```
 /aiops <task description>              # auto-dispatch
@@ -58,7 +58,7 @@ Each agent is defined in `agents/<name>.md`:
 
 ## Artifact contracts
 
-Agents communicate through `.scratch/<feature>/` files:
+Agents communicate through `.scratch/<feature>/` files. These files are the audit trail: they preserve what was decided, what was reviewed, and what the next phase may rely on.
 
 | Artifact | Producer | Consumers |
 |----------|----------|-----------|

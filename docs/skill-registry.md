@@ -1,6 +1,8 @@
 # Skill Registry
 
-Single reference for which skills exist in the aiops bundle, which are deferred, and which must not be cited.
+Reference for the capabilities behind the guided `/aiops` workflow.
+
+Most users should start with `/aiops` and let the router choose the path. Use this page when you want to inspect the underlying skills, invoke one directly, or understand which capabilities are intentionally deferred.
 
 ## Install
 
@@ -14,33 +16,33 @@ Skills CLI installs invoke `/aiops`, `/tdd`, etc. Claude Plugin installs use the
 
 ## Tier 1 (installed)
 
-From [`skills/manifest.json`](../../skills/manifest.json) — invoke as `/skill-name`:
+From [`skills/manifest.json`](../../skills/manifest.json). These can be invoked directly as `/skill-name`, but the normal path is still `/aiops <task>`:
 
 | Skill | Role |
 | --- | --- |
-| `/aiops` | Entry router |
-| `/aiops-implement` | Delivery overlay |
-| `/aiops-setup` | Per-project tracker + domain config |
-| `/explore` | Free-form thinking partner — discuss ideas, no artifacts |
-| `/lean` | Minimal-code ladder (delivery only) |
-| `/file-refactor` | File size discipline — split files over 500 lines |
-| `/prune` | Over-engineering gate after review |
-| `/grill-with-docs` | Alignment with CONTEXT + ADRs |
-| `/grilling` | Interview loop |
-| `/domain-modeling` | Glossary + ADR discipline |
-| `/tdd` | Test-driven development |
-| `/diagnosing-bugs` | Bug diagnosis |
-| `/triage` | Incoming request state machine |
-| `/to-prd` | Conversation → PRD |
-| `/to-issues` | PRD → vertical slices |
-| `/handoff` | Cross-session context |
-| `/prototype` | Throwaway prototypes |
-| `/review` | Standards + spec review |
-| `/gitops` | Git operations: sync, commit, push |
-| `/ui-mockup` | HTML/CSS mockup generation |
-| `/improve-codebase-architecture` | Architecture health scan + deepening opportunities |
-| `/architect-design` | Structured design process for architect agent |
-| `/code-graph` | Build and query code graph via graphify (Tree-sitter + Louvain) |
+| `/aiops` | Main entry: infer task type, show the current step, and keep progress resumable |
+| `/aiops-implement` | Delivery path: lean, TDD, prune, review, then approval |
+| `/aiops-setup` | Optional team setup for trackers, labels, and domain docs |
+| `/explore` | Think through an idea without creating delivery artifacts |
+| `/lean` | Keep the change small and avoid unrequested code |
+| `/file-refactor` | Split oversized files before they become hard to review |
+| `/prune` | Remove over-engineering before final review |
+| `/grill-with-docs` | Align decisions with CONTEXT.md and ADRs |
+| `/grilling` | Ask the missing questions until scope is clear |
+| `/domain-modeling` | Build shared vocabulary and decision records |
+| `/tdd` | Write the test first, then implement |
+| `/diagnosing-bugs` | Reproduce, find root cause, and keep the fix minimal |
+| `/triage` | Classify incoming work and route it to the right path |
+| `/to-prd` | Turn conversation into a PRD |
+| `/to-issues` | Split a PRD into vertical implementation slices |
+| `/handoff` | Preserve context for another session |
+| `/prototype` | Validate a risky idea with disposable code |
+| `/review` | Check the diff against standards and the originating spec |
+| `/gitops` | Commit and push after explicit approval |
+| `/ui-mockup` | Generate previewable HTML/CSS mockups for UI work |
+| `/improve-codebase-architecture` | Find evidence-backed architecture improvement opportunities |
+| `/architect-design` | Turn aligned requirements into a technical design |
+| `/code-graph` | Optional graphify-backed code graph for architecture and impact analysis |
 
 ## Tier 2 deferred (not installed)
 
@@ -54,7 +56,7 @@ Listed in `manifest.json` → `tier2Deferred`. Do **not** invoke these from bund
 
 ## Agents
 
-Agents wrap skills with specialized identity and constraints. See [agent-registry.md](agent-registry.md) for full documentation.
+Agents group these skills into phase owners. See [agent-registry.md](agent-registry.md) for how a task moves between them.
 
 | Agent | Skills |
 | --- | --- |

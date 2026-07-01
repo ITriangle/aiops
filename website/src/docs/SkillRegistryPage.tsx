@@ -20,60 +20,60 @@ interface SkillCategory {
 const categories: SkillCategory[] = [
   {
     id: 'router', icon: '🧭', title: { en: 'Router & Entry', zh: '路由与入口' },
-    desc: { en: 'Entry points and orchestration', zh: '入口点与流程编排' },
+    desc: { en: 'Start a task and keep the flow moving', zh: '开始任务，并让流程持续推进' },
     skills: [
-      { name: '/aiops', desc: { en: 'Entry router — Flow Conductor that infers task type, narrates steps, dispatches agents', zh: '入口路由——Flow Conductor，推断任务类型、叙述步骤、调度 agent' } },
-      { name: '/aiops-setup', desc: { en: 'Per-target-project setup — issue tracker, triage labels, domain docs', zh: '项目级配置——issue 追踪、分诊标签、领域文档' } },
+      { name: '/aiops', desc: { en: 'Main entry. Describe the work and aiops chooses the right path, step by step.', zh: '主入口。描述任务后，aiops 会选择合适路径并逐步推进。' } },
+      { name: '/aiops-setup', desc: { en: 'Optional setup for teams that need shared trackers or domain docs.', zh: '可选设置。团队需要共享任务跟踪或领域文档时使用。' } },
     ],
   },
   {
     id: 'alignment', icon: '🎯', title: { en: 'Alignment', zh: '对齐' },
-    desc: { en: 'Understand before building', zh: '构建前先理解' },
+    desc: { en: 'Clarify the work before code changes start', zh: '改代码前先把问题说清楚' },
     skills: [
-      { name: '/grilling', desc: { en: 'Interview loop — constraints, scope, acceptance criteria', zh: '对齐访谈——约束、范围、验收标准' } },
-      { name: '/grill-with-docs', desc: { en: 'Alignment grounded in CONTEXT.md + ADRs', zh: '基于 CONTEXT.md + ADR 的对齐' } },
-      { name: '/domain-modeling', desc: { en: 'Glossary + ADR discipline for shared vocabulary', zh: '术语表 + ADR 纪律，建立共享词汇' } },
-      { name: '/architect-design', desc: { en: 'Structured design process for architect agent', zh: '架构师 agent 的结构化设计流程' } },
-      { name: '/improve-codebase-architecture', desc: { en: 'Architecture health scan — shallow modules, leaked seams, deepening opportunities', zh: '架构健康扫描——浅层模块、泄漏接缝、深化机会' } },
-      { name: '/code-graph', desc: { en: 'Build and query code graph via graphify (Tree-sitter + Louvain)', zh: '通过 graphify 构建和查询代码图谱（Tree-sitter + Louvain）' } },
+      { name: '/grilling', desc: { en: 'Asks the missing questions until scope and acceptance criteria are clear.', zh: '持续追问缺失信息，直到范围和验收标准清楚。' } },
+      { name: '/grill-with-docs', desc: { en: 'Grounds decisions in CONTEXT.md, ADRs, and existing project notes.', zh: '基于 CONTEXT.md、ADR 和项目笔记做对齐。' } },
+      { name: '/domain-modeling', desc: { en: 'Builds shared vocabulary so later design and review use the same terms.', zh: '建立共享词汇，避免后续设计和评审各说各话。' } },
+      { name: '/architect-design', desc: { en: 'Turns aligned requirements into a technical design the builder can follow.', zh: '把已对齐需求转成 builder 能执行的技术设计。' } },
+      { name: '/improve-codebase-architecture', desc: { en: 'Finds evidence-backed refactor opportunities before choosing one to implement.', zh: '先找有证据的重构机会，再选择一项实现。' } },
+      { name: '/code-graph', desc: { en: 'Optional graphify-backed code graph for architecture and impact analysis.', zh: '可选的 graphify 代码图谱，用于架构和影响分析。' } },
     ],
   },
   {
     id: 'planning', icon: '📋', title: { en: 'Planning', zh: '规划' },
-    desc: { en: 'Break work into deliverable slices', zh: '拆分为可交付切片' },
+    desc: { en: 'Turn large ideas into work that can be delivered safely', zh: '把大想法拆成能安全交付的工作' },
     skills: [
-      { name: '/to-prd', desc: { en: 'Conversation → PRD document', zh: '对话 → PRD 文档' } },
-      { name: '/to-issues', desc: { en: 'PRD → vertical slices as issues', zh: 'PRD → 垂直切片 issue' } },
-      { name: '/handoff', desc: { en: 'Cross-session context preservation', zh: '跨会话上下文保持' } },
-      { name: '/triage', desc: { en: 'Incoming request state machine — classify and route', zh: '请求分诊状态机——分类和路由' } },
+      { name: '/to-prd', desc: { en: 'Turns a conversation into a concrete product brief.', zh: '把对话整理成明确的产品说明。' } },
+      { name: '/to-issues', desc: { en: 'Splits a PRD into vertical slices that can be handled one at a time.', zh: '把 PRD 拆成可以逐个处理的垂直切片。' } },
+      { name: '/handoff', desc: { en: 'Preserves enough context for a fresh session to continue the work.', zh: '保存足够上下文，让新会话可以继续。' } },
+      { name: '/triage', desc: { en: 'Classifies incoming requests and routes them to the right path.', zh: '分类新请求，并路由到合适路径。' } },
     ],
   },
   {
     id: 'delivery', icon: '🔨', title: { en: 'Delivery', zh: '交付' },
-    desc: { en: 'Build, test, ship', zh: '构建、测试、交付' },
+    desc: { en: 'Make the smallest correct change and prepare it for review', zh: '做出最小正确改动，并准备评审' },
     skills: [
-      { name: '/aiops-implement', desc: { en: 'Delivery overlay — hard gates for TDD, prune, review, commit approval', zh: '交付叠加层——TDD、prune、review、commit 审批的硬门' } },
-      { name: '/tdd', desc: { en: 'Test-driven development — red-green-refactor', zh: '测试驱动开发——红绿重构' } },
-      { name: '/prototype', desc: { en: 'Throwaway prototypes for risk validation', zh: '一次性原型，验证风险' } },
-      { name: '/diagnosing-bugs', desc: { en: 'Bug diagnosis — repro, root cause, minimal fix', zh: 'Bug 诊断——复现、根因、最小修复' } },
-      { name: '/gitops', desc: { en: 'Git operations: sync, commit, push', zh: 'Git 操作：sync、commit、push' } },
+      { name: '/aiops-implement', desc: { en: 'Runs the delivery ladder: lean, TDD, prune, review, then approval.', zh: '运行交付阶梯：lean、TDD、prune、review，然后等待确认。' } },
+      { name: '/tdd', desc: { en: 'Pins behavior with a failing test before writing the implementation.', zh: '先用失败测试固定行为，再写实现。' } },
+      { name: '/prototype', desc: { en: 'Builds a quick throwaway check when a risky idea needs proof.', zh: '高风险想法需要验证时，先做一次性原型。' } },
+      { name: '/diagnosing-bugs', desc: { en: 'Reproduces the problem, finds the cause, and keeps the fix narrow.', zh: '复现问题、找到根因，并保持修复范围很小。' } },
+      { name: '/gitops', desc: { en: 'Handles commit and push only after the delivery work is approved.', zh: '交付工作确认后才处理 commit 和 push。' } },
     ],
   },
   {
     id: 'quality', icon: '🛡️', title: { en: 'Quality Gates', zh: '质量门' },
-    desc: { en: 'Guardrails during delivery', zh: '交付过程中的护栏' },
+    desc: { en: 'Prevent drift, excess code, and unreviewed changes', zh: '防止偏移、多写和未评审改动' },
     skills: [
-      { name: '/lean', desc: { en: 'Minimal-code ladder — stdlib first, shortest working diff', zh: '最小代码阶梯——stdlib 优先，最短可用 diff' }, alwaysOn: true },
-      { name: '/file-refactor', desc: { en: 'File size discipline — split files over 500 lines', zh: '文件大小纪律——超过 500 行必须拆分' } },
-      { name: '/prune', desc: { en: 'Over-engineering gate — cut complexity before review', zh: '过度工程门——评审前砍掉复杂度' } },
-      { name: '/review', desc: { en: 'Standards + spec review — two-axis parallel check', zh: '标准 + 规格评审——双轴并行检查' } },
+      { name: '/lean', desc: { en: 'Keeps the diff focused: use existing tools and write only what the task needs.', zh: '保持 diff 聚焦：优先复用，只写任务需要的代码。' }, alwaysOn: true },
+      { name: '/file-refactor', desc: { en: 'Splits oversized files before they become hard to understand or review.', zh: '文件过大时先拆分，避免难理解、难评审。' } },
+      { name: '/prune', desc: { en: 'Cuts speculative complexity before the code review gate.', zh: '代码评审前砍掉猜测性的复杂度。' } },
+      { name: '/review', desc: { en: 'Checks the diff against both project standards and the originating spec.', zh: '同时对照项目标准和原始规格检查 diff。' } },
     ],
   },
   {
     id: 'design', icon: '🎨', title: { en: 'Design', zh: '设计' },
-    desc: { en: 'Visual and UI design', zh: '视觉与 UI 设计' },
+    desc: { en: 'See UI direction before implementation', zh: '实现前先看清 UI 方向' },
     skills: [
-      { name: '/ui-mockup', desc: { en: 'HTML/CSS mockup generation for UI proposals', zh: 'HTML/CSS 草图生成，用于 UI 方案' } },
+      { name: '/ui-mockup', desc: { en: 'Generates a previewable HTML mockup before the builder writes product code.', zh: '在 builder 写业务代码前生成可预览 HTML 草图。' } },
     ],
   },
 ]
@@ -95,8 +95,8 @@ export default function SkillRegistryPage() {
         </h1>
         <p className="text-muted-foreground text-base">
           {lang === 'zh'
-            ? '22 个 Tier 1 技能，覆盖从对齐到交付的完整流程。按类别浏览。'
-            : '22 Tier 1 skills covering the full flow from alignment to delivery. Browse by category.'}
+            ? '这些技能支撑 /aiops 的引导流程。平时从 /aiops 开始，需要时再深入查看每个能力。'
+            : 'These skills power the guided /aiops workflow. Start with /aiops, then use this registry when you want the details.'}
         </p>
       </div>
 

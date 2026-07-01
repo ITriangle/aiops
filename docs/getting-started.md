@@ -1,6 +1,6 @@
 # Getting started
 
-Install and use the bundle in a **target project** (your app repo, not the aiops meta-repo).
+Install aiops in a **target project** (your app repo, not this aiops meta-repo), then start by describing the work you want done.
 
 ## Prerequisites
 
@@ -30,13 +30,13 @@ Restart your IDE after install.
 
 ## 2. Start in your project
 
-Usually **no separate setup step**:
+Usually there is **no separate setup step**. Open your project in the AI IDE and type:
 
 ```
 /aiops Add a health check endpoint
 ```
 
-First run bootstraps silently (local markdown issues by default). Add `aiops.yaml` at repo root for GitHub/GitLab teams.
+aiops tracks work locally by default. Add `aiops.yaml` at repo root only when your team wants GitHub/GitLab issue tracking.
 
 Resume:
 
@@ -44,11 +44,26 @@ Resume:
 /aiops continue
 ```
 
-Explicit setup: `/aiops-setup`
+Explicit setup is available as `/aiops-setup`, but most projects do not need it.
 
 ## 3. Example — health endpoint
 
-Single-session feature: align → design → design review → implement (lean → tdd → prune → review) → commit only when you ask.
+A small feature usually stays in one session:
+
+1. Clarify scope and acceptance criteria
+2. Agree the API shape before coding
+3. Write a failing test first
+4. Implement the smallest working change
+5. Prune excess code and review the diff
+6. Commit only when you ask
+
+Bug reports take a shorter path: reproduce, diagnose, add a regression test, make the minimal fix, then review.
+
+## 4. Resume later
+
+Every task writes progress to `.scratch/<slug>/flow.state.yaml`. When you run `/aiops continue`, aiops restores the saved step and checks required gate artifacts before moving forward.
+
+You normally do not edit the state file by hand.
 
 ## Troubleshooting
 
@@ -56,7 +71,8 @@ Single-session feature: align → design → design review → implement (lean �
 | --- | --- |
 | `/aiops` not found | Re-run installer; restart IDE |
 | Stale skill behavior | Re-install to refresh `skills/aiops/` |
-| Wrong skill cited | [skill-registry.md](skill-registry.md) |
+| The flow chose the wrong path | Say so in chat; aiops can re-triage the task |
+| Wrong skill cited | Check [skill-registry.md](skill-registry.md) |
 
 ## Next steps
 

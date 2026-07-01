@@ -1,14 +1,14 @@
-# 实例走查与效果分析
+# 实例走查与效果
 
-> 真实运行记录 + 可复现的对比实验。每个 demo 都基于 [aiops-demo](https://github.com/yugasun/aiops-demo) 项目。
+> 从输入到结果的真实运行记录，以及可复现的对比实验。每个 demo 都基于 [aiops-demo](https://github.com/yugasun/aiops-demo) 项目。
 
 ## 目录
 
 | 文件 | 类型 | 内容 |
 |------|------|------|
-| [health-check-walkthrough.md](health-check-walkthrough.md) | 真实走查 | 给 Express API 加 health 接口，从 `/aiops` 到 commit 的完整过程 |
-| [architecture-scan-walkthrough.md](architecture-scan-walkthrough.md) | 真实走查 | graphify 构建代码图谱 → 4 视角扫描 → 深化 God module |
-| [effect-analysis.md](effect-analysis.md) | 对比实验 | with/without aiops 的度量数据和关键发现 |
+| [health-check-walkthrough.md](health-check-walkthrough.md) | 真实走查 | 输入一个 health 接口需求，看 aiops 如何澄清、测试、实现和等待确认 |
+| [architecture-scan-walkthrough.md](architecture-scan-walkthrough.md) | 真实走查 | 从代码结构证据出发，找到一个值得深化的架构改进点 |
+| [effect-analysis.md](effect-analysis.md) | 对比实验 | 对比直接让 AI 写和经过 aiops 流程后的交付差异 |
 | [benchmark.sh](benchmark.sh) | 自动化脚本 | 一键运行对比实验，生成报告 |
 
 ## 快速体验

@@ -6,14 +6,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs'
 import { Table, TableBody, TableCell, TableRow } from '../components/ui/table'
-import { Separator } from '../components/ui/separator'
 import { Link } from 'react-router-dom'
 import { JourneyStateSection } from './JourneyStateSection'
+import { BookOpen, Boxes, ChartNoAxesColumnIncreasing, GitBranch, Radar, ShieldCheck, Workflow } from 'lucide-react'
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
 const heroCount = 5
 const useCaseIds = ['health', 'bug', 'arch', 'rbac', 'resume'] as const
+
+const heroSignals = [
+  { icon: Radar, key: 'hero.signal.route' },
+  { icon: Workflow, key: 'hero.signal.resume' },
+  { icon: ShieldCheck, key: 'hero.signal.approve' },
+]
 
 // ── Section wrapper ───────────────────────────────────────────────────────────
 
@@ -22,9 +28,9 @@ export function Section({ id, label, title, desc, children }: {
 }) {
   return (
     <section id={id} className="py-20 max-w-5xl mx-auto px-6">
-      <div className="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-[var(--cyan)] mb-2"
-        style={{ textShadow: '0 0 10px rgba(34,211,238,0.3)' }}>
-        // {label}
+      <div className="inline-flex items-center gap-2 font-mono text-[0.68rem] uppercase tracking-[0.12em] text-[var(--cyan)] mb-3 ai-chip rounded-full px-3 py-1">
+        <span className="h-1.5 w-1.5 rounded-full bg-[var(--cyan)] shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
+        {label}
       </div>
       <h2 className="text-3xl font-bold mb-3 tracking-tight">{title}</h2>
       {desc && <p className="text-muted-foreground text-base mb-8 max-w-2xl">{desc}</p>}
@@ -59,12 +65,13 @@ function Hero() {
   }
 
   return (
-    <section className="relative pt-32 pb-24 text-center overflow-hidden">
-      <div className="absolute top-[-15%] left-1/2 -translate-x-1/2 w-[min(95vw,1100px)] h-[600px] bg-[radial-gradient(ellipse,rgba(108,138,255,0.12)_0%,rgba(34,211,238,0.06)_35%,transparent_70%)] pointer-events-none"
+    <section className="relative pt-28 pb-24 text-center overflow-hidden">
+      <div className="absolute top-[-18%] left-1/2 -translate-x-1/2 w-[min(95vw,1100px)] h-[620px] bg-[radial-gradient(ellipse,rgba(108,138,255,0.16)_0%,rgba(34,211,238,0.08)_35%,transparent_70%)] pointer-events-none"
         style={{ animation: 'heroGlowPulse 6s ease-in-out infinite' }} />
-      <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[min(80vw,800px)] h-[300px] bg-[radial-gradient(ellipse,rgba(74,222,128,0.08)_0%,transparent_60%)] pointer-events-none" />
+      <div className="absolute top-[12%] left-1/2 -translate-x-1/2 w-[min(80vw,800px)] h-[320px] bg-[radial-gradient(ellipse,rgba(74,222,128,0.08)_0%,transparent_60%)] pointer-events-none" />
+      <div className="absolute top-24 left-1/2 h-[1px] w-[min(88vw,900px)] -translate-x-1/2 bg-gradient-to-r from-transparent via-primary/35 to-transparent" />
 
-      <Badge variant="outline" className="mb-6 font-mono text-xs text-[var(--green)] bg-[var(--green-dim)] border-[rgba(74,222,128,0.25)] px-4 py-1.5"
+      <Badge variant="outline" className="mb-6 font-mono text-xs ai-chip px-4 py-1.5"
         style={{ boxShadow: '0 0 20px rgba(74,222,128,0.12)', animation: 'fadeUp 0.6s ease both' }}>
         {t('hero.tag')}
       </Badge>
@@ -84,74 +91,62 @@ function Hero() {
         {t('hero.lead')}
       </p>
 
-      <div className="flex items-center gap-2 justify-center text-xs font-mono text-[var(--cyan)] opacity-80 mb-8"
+      <div className="flex items-center gap-2 justify-center text-xs font-mono text-[var(--cyan)] opacity-80 mb-5"
         style={{ animation: 'fadeUp 0.6s 0.2s ease both' }}>
-        <span className="w-2 h-2 rounded-full bg-[var(--cyan)]"
-          style={{ boxShadow: '0 0 10px var(--cyan)', animation: 'aiPulse 2s ease-in-out infinite' }} />
+        <span className="w-2 h-2 rounded-full bg-[var(--cyan)]" style={{ boxShadow: '0 0 10px var(--cyan)' }} />
         {t('hero.ai-status')}
       </div>
 
-      <Card className="max-w-3xl mx-auto mb-8 bg-[rgba(14,15,22,0.85)] backdrop-blur-2xl border-[rgba(108,138,255,0.12)] overflow-hidden text-left rounded-xl"
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 max-w-3xl mx-auto mb-8" style={{ animation: 'fadeUp 0.6s 0.22s ease both' }}>
+        {heroSignals.map(({ icon: Icon, key }) => (
+          <div key={key} className="ai-panel ai-panel-interactive rounded-xl px-3 py-3 flex items-center gap-2 text-left">
+            <Icon className="relative h-4 w-4 text-[var(--cyan)] shrink-0" strokeWidth={1.8} />
+            <span className="relative text-xs text-muted-foreground leading-snug">{t(key)}</span>
+          </div>
+        ))}
+      </div>
+
+      <Card className="ai-panel max-w-3xl mx-auto mb-8 backdrop-blur-2xl overflow-hidden text-left rounded-xl"
         style={{ animation: 'fadeUp 0.6s 0.24s ease both', boxShadow: '0 0 60px rgba(108,138,255,0.08), 0 0 0 1px rgba(108,138,255,0.06), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
-        <div className="flex items-center justify-between px-4 py-2.5 border-b border-[rgba(108,138,255,0.08)] font-mono text-[0.7rem] text-muted-foreground">
+        <div className="relative flex items-center justify-between px-4 py-2.5 border-b border-[rgba(108,138,255,0.12)] font-mono text-[0.7rem] text-muted-foreground">
           <div className="flex gap-2">
             <span className="w-[9px] h-[9px] rounded-full bg-[#ff5f57]" />
             <span className="w-[9px] h-[9px] rounded-full bg-[#febc2e]" />
             <span className="w-[9px] h-[9px] rounded-full bg-[#28c840]" />
           </div>
-          <span className="opacity-60">Cursor / Claude Code / Codex</span>
+          <span className="opacity-60">Claude Code · Cursor · Copilot · Codex · Windsurf</span>
         </div>
-        <CardContent className="p-5">
+        <CardContent className="relative p-5">
           <div className="font-mono text-[0.72rem] text-muted-foreground mb-2">{t('hero.terminal.label')}</div>
           <div className="font-mono text-base text-[var(--green)] min-h-[1.6em] leading-relaxed"
             style={{ textShadow: '0 0 12px rgba(74,222,128,0.25)' }}>
             {displayed}<span style={{ animation: 'cursorBlink 1s step-end infinite' }}>▊</span>
           </div>
-          <div className="text-sm text-muted-foreground mt-3" dangerouslySetInnerHTML={{ __html: t(`hero.hint.${idx}`) }} />
+          <div className="text-sm text-muted-foreground mt-3 border-l border-[var(--cyan)]/25 pl-3" dangerouslySetInnerHTML={{ __html: t(`hero.hint.${idx}`) }} />
           <div className="flex gap-2.5 mt-4 flex-wrap">
-            <Button variant="outline" size="sm" className="font-mono text-xs h-8"
+            <Button variant="outline" size="sm" className="ai-control font-mono text-xs h-11 px-4 hover:bg-primary/10 active:translate-y-px"
               onClick={() => navigator.clipboard.writeText(t(`hero.cmd.${idx}`))}>
               {t('hero.copy')}
             </Button>
-            <Button variant="outline" size="sm" className="font-mono text-xs h-8" onClick={rotate}>
+            <Button variant="outline" size="sm" className="ai-control font-mono text-xs h-11 px-4 hover:bg-primary/10 active:translate-y-px" onClick={rotate}>
               {t('hero.rotate')}
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      <div className="flex gap-3 justify-center flex-wrap mb-12" style={{ animation: 'fadeUp 0.6s 0.32s ease both' }}>
-        <Button size="lg" className="relative overflow-hidden font-mono h-11 px-7"
+      <div className="flex gap-3 justify-center flex-wrap" style={{ animation: 'fadeUp 0.6s 0.32s ease both' }}>
+        <Button size="lg" className="relative overflow-hidden font-mono h-12 px-7 min-w-[9rem] active:translate-y-px"
           style={{ boxShadow: '0 0 25px rgba(108,138,255,0.3)' }}
           onClick={() => document.getElementById('install')?.scrollIntoView({ behavior: 'smooth' })}>
           {t('hero.btn.install')}
           <span className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-[linear-gradient(45deg,transparent_30%,rgba(255,255,255,0.08)_50%,transparent_70%)]"
             style={{ animation: 'shimmer 3s ease-in-out infinite' }} />
         </Button>
-        <Button variant="outline" size="lg" className="font-mono h-11 px-7"
+        <Button variant="outline" size="lg" className="ai-control font-mono h-12 px-7 min-w-[9rem] hover:bg-primary/10 active:translate-y-px"
           onClick={() => document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' })}>
           {t('hero.btn.examples')}
         </Button>
-        <Button variant="outline" size="lg" className="font-mono h-11 px-7"
-          onClick={() => window.open('https://github.com/yugasun/aiops', '_blank')}>
-          {t('hero.btn.github')}
-        </Button>
-      </div>
-
-      <div className="flex justify-center gap-4 sm:gap-6 flex-wrap max-w-3xl mx-auto" style={{ animation: 'fadeUp 0.6s 0.4s ease both' }}>
-        {[
-          { num: '23', key: 'stat.skills' },
-          { num: '9', key: 'stat.agents' },
-          { num: '6', key: 'stat.ides' },
-          { num: '-43%', key: 'stat.diff' },
-        ].map((s) => (
-          <div key={s.key} className="flex-1 min-w-[120px] bg-card/40 backdrop-blur-xl border border-border/50 rounded-xl px-5 py-4 text-center hover:border-primary/20 transition-all">
-            <div className="font-mono text-2xl font-bold bg-gradient-to-br from-[var(--accent)] to-[var(--cyan)] bg-clip-text text-transparent">
-              {s.num}
-            </div>
-            <div className="text-[0.72rem] text-muted-foreground uppercase tracking-wider mt-1">{t(s.key)}</div>
-          </div>
-        ))}
       </div>
     </section>
   )
@@ -172,17 +167,23 @@ function InstallSection() {
 
   return (
     <Section id="install" label={t('install.label')} title={t('install.title')}>
-      <div className="space-y-3">
+      <div className="grid gap-3">
         {blocks.map((b) => (
-          <Card key={b.cmd} className="bg-card/70 backdrop-blur-xl border-primary/10">
-            <CardHeader className="flex flex-row items-center justify-between py-2.5 px-4 border-b border-border">
-              <span className="text-xs text-muted-foreground">{b.label}</span>
-              <Button variant="ghost" size="sm" className="font-mono text-[0.68rem] h-6 px-2"
+          <Card key={b.cmd} className={cn(
+            'ai-panel ai-panel-interactive backdrop-blur-xl overflow-hidden',
+            b.label === t('install.recommended') && 'border-[var(--green)]/30',
+          )}>
+            <CardHeader className="relative flex flex-row items-center justify-between py-2.5 px-4 border-b border-border">
+              <span className={cn(
+                'text-xs text-muted-foreground',
+                b.label === t('install.recommended') && 'text-[var(--green)] font-medium',
+              )}>{b.label}</span>
+              <Button variant="ghost" size="sm" className="font-mono text-[0.68rem] h-10 px-3 hover:bg-primary/10 active:translate-y-px"
                 onClick={() => copy(b.cmd)}>
                 {copied === b.cmd ? 'Copied' : 'Copy'}
               </Button>
             </CardHeader>
-            <CardContent className="py-3 px-4 font-mono text-sm text-[var(--green)]"
+            <CardContent className="relative py-3 px-4 font-mono text-sm text-[var(--green)] overflow-x-auto"
               style={{ textShadow: '0 0 8px rgba(74,222,128,0.2)' }}>
               <span className="text-[var(--cyan)] mr-2" style={{ textShadow: '0 0 8px rgba(34,211,238,0.3)' }}>$</span>
               {b.cmd}
@@ -203,13 +204,13 @@ function UseCasesSection() {
 
   return (
     <Section id="examples" label={t('examples.label')} title={t('examples.title')} desc={t('examples.desc')}>
-      <Card className="bg-card/70 backdrop-blur-xl border-primary/10 overflow-hidden">
+      <Card className="ai-panel backdrop-blur-xl overflow-hidden">
         <Tabs value={active} onValueChange={setActive}>
-          <div className="border-b border-border px-4 py-3">
-            <TabsList className="bg-muted/50 h-auto gap-1.5 p-1">
+          <div className="border-b border-border px-4 py-3 overflow-x-auto">
+            <TabsList className="ai-control h-auto gap-1.5 p-1.5 inline-flex min-w-max rounded-xl">
               {useCaseIds.map((id) => (
                 <TabsTrigger key={id} value={id}
-                  className="font-mono text-xs data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-primary/30 border border-transparent px-3 py-1.5 rounded-lg">
+                  className="ai-tab font-mono text-xs data-[state=active]:text-primary border border-transparent px-3 py-2.5 rounded-lg hover:bg-primary/5 hover:text-foreground cursor-pointer">
                   {t(`usecase.${id}.label`)}
                 </TabsTrigger>
               ))}
@@ -218,35 +219,44 @@ function UseCasesSection() {
 
           {useCaseIds.map((id) => (
             <TabsContent key={id} value={id} className="p-5 mt-0" style={{ animation: 'fadeSlideUp 0.3s ease both' }}>
-              <Badge variant="outline" className="font-mono text-[0.65rem] text-primary border-primary/30 mb-2">
-                {t(`usecase.${id}.tag`)}
-              </Badge>
-              <h3 className="text-lg font-bold mb-2">{t(`usecase.${id}.title`)}</h3>
-              <p className="text-sm text-muted-foreground mb-4">{t(`usecase.${id}.scenario`)}</p>
+              <div className="grid gap-5 lg:grid-cols-[1fr_1.1fr] items-start">
+                <div>
+                  <Badge variant="outline" className="font-mono text-[0.65rem] text-primary border-primary/30 mb-2">
+                    {t(`usecase.${id}.tag`)}
+                  </Badge>
+                  <h3 className="text-xl font-bold mb-2">{t(`usecase.${id}.title`)}</h3>
+                  <p className="text-sm text-muted-foreground mb-4">{t(`usecase.${id}.scenario`)}</p>
 
-              <Card className="bg-muted/50 border-border mb-4 relative">
-                <CardContent className="p-3">
-                  <Button variant="ghost" size="sm" className="absolute top-2 right-2 font-mono text-[0.68rem] h-6 px-2"
-                    onClick={() => navigator.clipboard.writeText(t(`hero.cmd.${useCaseIds.indexOf(id)}`))}>{t('usecase.copy')}</Button>
-                  <pre className="font-mono text-sm text-[var(--green)] whitespace-pre-wrap pr-14"
-                    style={{ textShadow: '0 0 8px rgba(74,222,128,0.2)' }}>
-                    {t(`hero.cmd.${useCaseIds.indexOf(id)}`)}
-                  </pre>
-                </CardContent>
-              </Card>
-
-              <Separator className="mb-3" />
-              <div className="text-sm text-muted-foreground">
-                <strong className="text-foreground">{t('usecase.youget')}</strong> {t(`usecase.${id}.outcome`)}
-                <div className="flex gap-1.5 mt-3 flex-wrap">
-                  {t(`usecase.${id}.flow`).split(',').map((f, i, arr) => (
-                    <span key={i} className="flex items-center gap-1.5">
-                      <Badge variant="secondary" className="font-mono text-xs">{f}</Badge>
-                      {i < arr.length - 1 && <span className="text-muted-foreground text-xs">→</span>}
-                    </span>
-                  ))}
+                  <Card className="bg-background/40 border-border/70 relative overflow-hidden">
+                    <CardContent className="p-4">
+                      <Button variant="ghost" size="sm" className="absolute top-2 right-2 font-mono text-[0.68rem] h-10 px-3 hover:bg-primary/10 active:translate-y-px"
+                        onClick={() => navigator.clipboard.writeText(t(`hero.cmd.${useCaseIds.indexOf(id)}`))}>{t('usecase.copy')}</Button>
+                      <div className="font-mono text-[0.68rem] text-muted-foreground mb-2">{t('hero.terminal.label')}</div>
+                      <pre className="font-mono text-sm text-[var(--green)] whitespace-pre-wrap pr-16 leading-relaxed min-h-[3.5rem]"
+                        style={{ textShadow: '0 0 8px rgba(74,222,128,0.2)' }}>
+                        {t(`hero.cmd.${useCaseIds.indexOf(id)}`)}
+                      </pre>
+                    </CardContent>
+                  </Card>
                 </div>
-                <div className="mt-2 font-mono text-[0.72rem] text-muted-foreground">{t(`usecase.${id}.meta`)}</div>
+
+                <div className="rounded-xl border border-border/70 bg-background/30 p-4">
+                  <div className="text-sm text-muted-foreground mb-4">
+                    <strong className="text-foreground">{t('usecase.youget')}</strong> {t(`usecase.${id}.outcome`)}
+                  </div>
+                  <div className="space-y-2">
+                    {t(`usecase.${id}.flow`).split(',').map((f, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <span className="h-7 w-7 rounded-lg bg-primary/10 border border-primary/20 text-primary font-mono text-xs flex items-center justify-center shrink-0">
+                          {i + 1}
+                        </span>
+                        <span className="text-sm text-foreground">{f}</span>
+                        <span className="h-px flex-1 bg-border/60" />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-4 font-mono text-[0.72rem] text-muted-foreground">{t(`usecase.${id}.meta`)}</div>
+                </div>
               </div>
             </TabsContent>
           ))}
@@ -260,36 +270,24 @@ function UseCasesSection() {
 
 function GatesSection() {
   const { t } = useI18n()
-  const [active, setActive] = useState('0')
 
   return (
     <Section id="gates" label={t('gates.label')} title={t('gates.title')} desc={t('gates.desc')}>
-      <Tabs value={active} onValueChange={setActive}>
-        <TabsList className="bg-muted/50 h-auto gap-1 p-1 mb-4 flex flex-wrap">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <TabsTrigger key={i} value={String(i)}
-              className="font-mono text-xs data-[state=active]:bg-primary/10 data-[state=active]:text-primary border border-transparent px-3 py-1.5 rounded-lg">
-              <span className={cn(
-                'w-[18px] h-[18px] rounded text-[0.65rem] flex items-center justify-center mr-1.5',
-                Number(active) >= i ? 'bg-[var(--green)] text-[var(--bg)]' : 'bg-muted'
-              )} style={Number(active) >= i ? { boxShadow: '0 0 8px rgba(74,222,128,0.3)' } : {}}>
-                {i}
-              </span>
-              {t(`gates.${i}.name`)}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <TabsContent key={i} value={String(i)}>
-            <Card className="bg-card/60 backdrop-blur-xl">
-              <CardContent className="p-4 text-sm text-muted-foreground min-h-[4rem]">
-                {t(`gates.${i}.desc`)}
-              </CardContent>
-            </Card>
-          </TabsContent>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {[1, 2, 3].map((i) => (
+          <Card key={i} className="ai-panel ai-panel-interactive backdrop-blur-xl hover:border-primary/30">
+            <CardContent className="relative p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-6 h-6 rounded bg-[var(--green-dim)] text-[var(--green)] font-mono text-xs flex items-center justify-center">
+                  {i}
+                </span>
+                <h3 className="text-sm font-semibold">{t(`gates.${i}.name`)}</h3>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t(`gates.${i}.desc`)}</p>
+            </CardContent>
+          </Card>
         ))}
-      </Tabs>
+      </div>
     </Section>
   )
 }
@@ -330,9 +328,9 @@ function EffectsSection() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         {stats.map((s) => (
-          <Card key={s.num} className="bg-card/60 backdrop-blur-xl border-[rgba(74,222,128,0.1)] text-center hover:border-[rgba(74,222,128,0.25)] transition-all"
+          <Card key={s.num} className="ai-panel ai-panel-interactive backdrop-blur-xl text-center hover:border-[rgba(74,222,128,0.25)]"
             style={{ boxShadow: '0 0 20px rgba(74,222,128,0.08)' }}>
-            <CardContent className="p-4">
+            <CardContent className="relative p-4">
               <div className="font-mono text-2xl font-bold text-[var(--green)]"
                 style={{ textShadow: '0 0 15px rgba(74,222,128,0.4)' }}>{s.num}</div>
               <div className="text-[0.72rem] text-muted-foreground mt-1">{t(s.key)}</div>
@@ -343,7 +341,7 @@ function EffectsSection() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {compareCards.map((card) => (
-          <Card key={card.variant} className="bg-card/60 backdrop-blur-xl">
+          <Card key={card.variant} className="ai-panel backdrop-blur-xl overflow-hidden">
             <CardHeader className="pb-3">
               <CardTitle className={cn('font-mono text-xs', card.color)}>
                 {t(`effects.compare.${card.variant}.title`)}
@@ -376,26 +374,29 @@ function DocsLinkSection() {
   const { t } = useI18n()
 
   const links = [
-    { to: '/docs/getting-started', icon: '→', labelKey: 'docs.link.start.label', descKey: 'docs.link.start.desc' },
-    { to: '/docs/skills', icon: '⚡', labelKey: 'docs.link.skills.label', descKey: 'docs.link.skills.desc' },
-    { to: '/docs/agents', icon: '🤖', labelKey: 'docs.link.agents.label', descKey: 'docs.link.agents.desc' },
-    { to: '/docs/demos', icon: '📊', labelKey: 'docs.link.demos.label', descKey: 'docs.link.demos.desc' },
+    { to: '/docs/getting-started', icon: BookOpen, labelKey: 'docs.link.start.label', descKey: 'docs.link.start.desc' },
+    { to: '/docs/skills', icon: Boxes, labelKey: 'docs.link.skills.label', descKey: 'docs.link.skills.desc' },
+    { to: '/docs/agents', icon: GitBranch, labelKey: 'docs.link.agents.label', descKey: 'docs.link.agents.desc' },
+    { to: '/docs/demos', icon: ChartNoAxesColumnIncreasing, labelKey: 'docs.link.demos.label', descKey: 'docs.link.demos.desc' },
   ]
 
   return (
     <Section id="docs" label={t('docs.label')} title={t('docs.title')} desc={t('docs.desc')}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {links.map((l) => (
+        {links.map((l) => {
+          const Icon = l.icon
+          return (
           <Link key={l.to} to={l.to}>
-            <Card className="bg-card/60 backdrop-blur-xl border-border hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer h-full">
-              <CardContent className="p-4">
-                <div className="text-lg mb-1">{l.icon}</div>
+            <Card className="ai-panel ai-panel-interactive backdrop-blur-xl hover:border-primary/30 hover:bg-primary/5 cursor-pointer h-full">
+              <CardContent className="p-4 min-h-[8rem]">
+                <Icon className="relative h-5 w-5 mb-2 text-[var(--cyan)]" strokeWidth={1.8} />
                 <div className="font-semibold text-sm mb-1">{t(l.labelKey)}</div>
                 <div className="text-xs text-muted-foreground">{t(l.descKey)}</div>
               </CardContent>
             </Card>
           </Link>
-        ))}
+          )
+        })}
       </div>
     </Section>
   )

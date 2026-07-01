@@ -42,12 +42,13 @@ export default function DocsLayout() {
       <div className="flex gap-8">
         {/* Desktop sidebar */}
         <aside className="hidden md:block w-64 flex-shrink-0">
-          <div className="sticky top-24">
-            <h3 className="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-[var(--cyan)] mb-4"
+          <div className="sticky top-24 ai-panel rounded-xl p-4">
+            <h3 className="relative font-mono text-[0.68rem] uppercase tracking-[0.12em] text-[var(--cyan)] mb-4 flex items-center gap-2"
               style={{ textShadow: '0 0 10px rgba(34,211,238,0.3)' }}>
-              // {t('docs.sidebar')}
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--cyan)] shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
+              {t('docs.sidebar')}
             </h3>
-            <div className="border-l border-border pl-4">
+            <div className="relative">
               <SidebarContent />
             </div>
           </div>
@@ -69,7 +70,7 @@ export default function DocsLayout() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 rounded-2xl border border-border/60 bg-background/25 backdrop-blur-sm p-0 md:p-6">
           <Outlet />
         </div>
       </div>

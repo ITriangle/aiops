@@ -16,17 +16,17 @@ export function JourneyStateSection() {
   return (
     <Section id="journey" label={t('journey.label')} title={t('journey.title')} desc={t('journey.desc')}>
       {/* Resume experience demo */}
-      <Card className="max-w-2xl mx-auto mb-5 bg-[rgba(14,15,22,0.85)] backdrop-blur-2xl border-[rgba(108,138,255,0.12)] overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-2 border-b border-[rgba(108,138,255,0.08)] font-mono text-[0.7rem] text-muted-foreground">
+      <Card className="ai-panel max-w-2xl mx-auto mb-5 backdrop-blur-2xl overflow-hidden">
+        <div className="relative flex items-center justify-between px-4 py-2 border-b border-[rgba(108,138,255,0.12)] font-mono text-[0.7rem] text-muted-foreground">
           <span>{t('journey.demo.title')}</span>
-          <span className="opacity-50">/aiops</span>
+          <span className="ai-chip rounded-full px-2 py-0.5 text-[0.62rem]">/aiops</span>
         </div>
-        <CardContent className="p-5 font-mono text-sm leading-relaxed space-y-3">
+        <CardContent className="relative p-5 font-mono text-sm leading-relaxed space-y-3">
           {steps.map((s, i) => (
             <div key={i} className={cn(
-              'transition-all',
+              'transition-all rounded-lg px-2 py-1',
               s.dim && 'opacity-50 text-xs',
-              s.highlight && 'text-[var(--green)]',
+              s.highlight && 'text-[var(--green)] bg-[var(--green-dim)] border border-[var(--green)]/15',
             )}>
               {s.input && (
                 <div className="flex gap-2">
@@ -49,9 +49,9 @@ export function JourneyStateSection() {
       {/* Feature cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[1, 2, 3].map((i) => (
-          <Card key={i} className="bg-card/60 backdrop-blur-xl border-border hover:border-[rgba(74,222,128,0.25)] transition-all"
+          <Card key={i} className="ai-panel backdrop-blur-xl hover:border-[rgba(74,222,128,0.25)] transition-all"
             style={{ boxShadow: '0 0 15px rgba(74,222,128,0.05)' }}>
-            <CardContent className="p-4">
+            <CardContent className="relative p-4">
               <div className="flex items-center gap-2 mb-2">
                 <span className={cn(
                   'w-6 h-6 rounded text-xs flex items-center justify-center font-mono font-bold',

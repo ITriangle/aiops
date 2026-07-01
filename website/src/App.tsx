@@ -14,10 +14,12 @@ import DemosPage from './docs/DemosPage'
 function Nav() {
   const { t, toggle, lang } = useI18n()
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center justify-between px-6 bg-background/80 backdrop-blur-2xl border-b border-border/50"
-      style={{ boxShadow: '0 1px 24px rgba(0,0,0,0.4), 0 1px 0 rgba(108,138,255,0.06)' }}>
-      <Link to="/" className="font-mono font-bold text-lg text-foreground hover:no-underline">
-        ai<span className="text-primary">ops</span>
+    <nav className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center justify-between px-6 bg-background/72 backdrop-blur-2xl border-b border-primary/10"
+      style={{ boxShadow: '0 1px 28px rgba(0,0,0,0.42), 0 1px 0 rgba(108,138,255,0.08)' }}>
+      <Link to="/" className="group font-mono font-bold text-lg text-foreground hover:no-underline flex items-center gap-2">
+        <span className="h-2 w-2 rounded-full bg-[var(--cyan)] shadow-[0_0_10px_rgba(34,211,238,0.45)]" />
+        <span>ai<span className="text-primary">ops</span></span>
+        <span className="hidden sm:inline rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[0.62rem] font-normal text-muted-foreground">v1.4.0</span>
       </Link>
       <div className="flex items-center gap-1">
         <Link to="/docs/getting-started"
@@ -52,24 +54,6 @@ function Footer() {
   )
 }
 
-// ── Particles ─────────────────────────────────────────────────────────────────
-
-function DataParticles() {
-  return (
-    <>
-      {[0, 1, 2, 3, 4].map((i) => (
-        <div key={i} className="fixed w-[3px] h-[3px] rounded-full pointer-events-none z-0"
-          style={{
-            left: `${15 + i * 20}%`,
-            background: ['var(--accent)', 'var(--green)', 'var(--cyan)', 'var(--accent)', 'var(--green)'][i],
-            animation: `particleFloat ${15}s linear ${i * 3}s infinite`,
-            opacity: 0,
-          }} />
-      ))}
-    </>
-  )
-}
-
 // ── Scroll to top on route change ───────────────────────────────────────────
 
 function ScrollToTop() {
@@ -84,7 +68,6 @@ export default function App() {
   return (
     <I18nProvider>
       <ScrollToTop />
-      <DataParticles />
       <Nav />
       <Routes>
         <Route path="/" element={<Landing />} />

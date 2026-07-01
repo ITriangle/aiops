@@ -16,63 +16,63 @@ interface Agent {
 const agents: Agent[] = [
   {
     id: 'architect', icon: '🏛️', role: { en: 'Alignment', zh: '对齐' },
-    desc: { en: 'Interviews the user, grounds in CONTEXT.md + ADRs, produces NOTES.md and tech-spec.md', zh: '访谈用户，基于 CONTEXT.md + ADR 对齐，产出 NOTES.md 和 tech-spec.md' },
+    desc: { en: 'Clarifies the problem and turns decisions into NOTES.md and tech-spec.md', zh: '澄清问题，并把决策写入 NOTES.md 和 tech-spec.md' },
     skills: ['grilling', 'grill-with-docs', 'domain-modeling', 'architect-design', 'improve-codebase-architecture', 'code-graph'],
     outputs: ['NOTES.md', 'tech-spec.md'],
     color: 'text-purple-400',
   },
   {
     id: 'design-reviewer', icon: '🔎', role: { en: 'Design gate', zh: '设计门' },
-    desc: { en: 'Reviews design against NOTES and spec before planning starts', zh: '在规划前对照 NOTES 和规格评审设计' },
+    desc: { en: 'Checks the design before planning and implementation depend on it', zh: '在规划和实现依赖设计前先检查它' },
     skills: ['review'],
     outputs: ['DESIGN_REVIEW.md'],
     color: 'text-blue-400',
   },
   {
     id: 'planner', icon: '📐', role: { en: 'Planning', zh: '规划' },
-    desc: { en: 'Converts alignment into PRD, breaks into vertical-slice issues', zh: '将对齐结果转化为 PRD，拆分为垂直切片 issue' },
+    desc: { en: 'Turns larger work into a PRD and vertical slices', zh: '把较大的工作转成 PRD 和垂直切片' },
     skills: ['to-prd', 'to-issues', 'handoff', 'aiops-setup'],
     outputs: ['PRD.md', 'plan.md', 'issues/'],
     color: 'text-cyan-400',
   },
   {
     id: 'prototyper', icon: '🧪', role: { en: 'Prototype', zh: '原型' },
-    desc: { en: 'Builds throwaway prototypes to validate risky assumptions', zh: '构建一次性原型验证高风险假设' },
+    desc: { en: 'Validates risky assumptions with disposable prototypes', zh: '用一次性原型验证高风险假设' },
     skills: ['prototype', 'lean'],
     outputs: ['VERDICT.md', 'prototype/'],
     color: 'text-amber-400',
   },
   {
     id: 'builder', icon: '🔨', role: { en: 'Delivery', zh: '交付' },
-    desc: { en: 'Implements code with TDD discipline and lean principles', zh: '以 TDD 纪律和 lean 原则实现代码' },
+    desc: { en: 'Implements the smallest tested change that satisfies the plan', zh: '按计划实现最小且经过测试的改动' },
     skills: ['aiops-implement', 'tdd', 'lean'],
     outputs: ['source code', 'test files'],
     color: 'text-green-400',
   },
   {
     id: 'ui-designer', icon: '🎨', role: { en: 'UI design', zh: 'UI 设计' },
-    desc: { en: 'Generates HTML/CSS mockups for UI proposals', zh: '为 UI 方案生成 HTML/CSS 草图' },
+    desc: { en: 'Creates previewable UI mockups before product code is written', zh: '在写业务代码前创建可预览 UI 草图' },
     skills: ['ui-mockup'],
     outputs: ['mockups/', 'design-notes.md'],
     color: 'text-pink-400',
   },
   {
     id: 'code-reviewer', icon: '📋', role: { en: 'Delivery gate', zh: '交付门' },
-    desc: { en: 'Reviews diff against standards and originating spec', zh: '对照标准和原始规格评审 diff' },
+    desc: { en: 'Reviews the diff against project standards and the originating spec', zh: '对照项目标准和原始规格评审 diff' },
     skills: ['review'],
     outputs: ['REVIEW.md'],
     color: 'text-blue-400',
   },
   {
     id: 'quality-auditor', icon: '✂️', role: { en: 'Delivery gate', zh: '交付门' },
-    desc: { en: 'Prunes over-engineering — shorter diff before ship', zh: '裁剪过度工程——交付前缩短 diff' },
+    desc: { en: 'Flags unnecessary complexity before delivery', zh: '交付前指出不必要的复杂度' },
     skills: ['prune'],
     outputs: ['prune findings'],
     color: 'text-orange-400',
   },
   {
     id: 'gitops', icon: '🚀', role: { en: 'Delivery', zh: '交付' },
-    desc: { en: 'Handles git sync, commit, and push', zh: '处理 git sync、commit 和 push' },
+    desc: { en: 'Handles git operations after explicit approval', zh: '在明确确认后处理 git 操作' },
     skills: ['gitops'],
     outputs: ['commit + push'],
     color: 'text-emerald-400',
@@ -122,8 +122,8 @@ export default function AgentRegistryPage() {
         </h1>
         <p className="text-muted-foreground text-base">
           {lang === 'zh'
-            ? '9 个专用 Agent，从对齐到交付的完整链路。技能是动词，Agent 是名词。'
-            : '9 specialized agents covering the full chain from alignment to delivery. Skills are verbs; agents are nouns.'}
+            ? 'aiops 会按任务类型选择负责人。每个 Agent 负责一个阶段，并留下可检查的产物。'
+            : 'aiops picks the right owner for each task type. Each agent owns a phase and leaves inspectable artifacts behind.'}
         </p>
       </div>
 
@@ -187,8 +187,8 @@ export default function AgentRegistryPage() {
         </h2>
         <p className="text-sm text-muted-foreground mb-5">
           {lang === 'zh'
-            ? '不同任务类型的 Agent 调度链路。Router 自动选择，用户也可直接指定。'
-            : 'Agent dispatch chains by task type. The router selects automatically, or users can invoke directly.'}
+            ? '你通常只输入 /aiops。Router 会根据任务类型选择下面的链路。'
+            : 'You usually start with /aiops. The router chooses one of these chains based on the task.'}
         </p>
         <div className="space-y-4">
           {sequences.map((s) => (
@@ -226,8 +226,8 @@ export default function AgentRegistryPage() {
         </h2>
         <p className="text-sm text-muted-foreground mb-5">
           {lang === 'zh'
-            ? 'Agent 通过 .scratch/<feature>/ 中的文件通信。生产者写入，消费者读取。'
-            : 'Agents communicate through .scratch/<feature>/ files. Producers write; consumers read.'}
+            ? '这些文件让后续阶段知道前面做过什么，也让评审有据可查。'
+            : 'These files preserve decisions for later phases and give reviewers something concrete to check.'}
         </p>
         <div className="space-y-2">
           {artifacts.map((a) => (

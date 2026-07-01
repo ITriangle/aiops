@@ -19,18 +19,18 @@ const scenarios = [
     prompt: '/aiops add a health endpoint returning JSON with status and app version',
     steps: {
       en: [
-        { phase: 'Align', desc: 'Interviews you on scope, acceptance criteria, edge cases' },
-        { phase: 'Design', desc: 'Writes NOTES.md with API shape, response format' },
-        { phase: 'Review', desc: 'Design reviewer checks against NOTES before coding' },
-        { phase: 'Implement', desc: 'TDD: writes test first, then minimal code, then prune' },
-        { phase: 'Ship', desc: 'Shows diff, waits for your approval before commit' },
+        { phase: 'Align', desc: 'Clarifies scope, acceptance criteria, and edge cases' },
+        { phase: 'Design', desc: 'Turns decisions into the API shape and response format' },
+        { phase: 'Review', desc: 'Checks the design before coding starts' },
+        { phase: 'Implement', desc: 'Writes tests first, then the smallest working code' },
+        { phase: 'Ship', desc: 'Shows the diff and waits for your approval' },
       ],
       zh: [
-        { phase: '对齐', desc: '访谈范围、验收标准、边界情况' },
-        { phase: '设计', desc: '写 NOTES.md，确定 API 形状和响应格式' },
-        { phase: '评审', desc: '设计评审员对照 NOTES 检查，再进入编码' },
-        { phase: '实现', desc: 'TDD：先写测试，再写最小代码，然后 prune' },
-        { phase: '交付', desc: '展示 diff，等你确认后才 commit' },
+        { phase: '对齐', desc: '明确范围、验收标准和边界情况' },
+        { phase: '设计', desc: '把决策转成 API 形状和响应格式' },
+        { phase: '评审', desc: '编码前先检查设计' },
+        { phase: '实现', desc: '先写测试，再写最小可用代码' },
+        { phase: '交付', desc: '展示 diff，等待你确认' },
       ],
     },
     result: { en: '+32 lines, 2 tests, 0 over-engineering', zh: '+32 行代码、2 个测试、0 过度工程' },
@@ -42,14 +42,14 @@ const scenarios = [
     prompt: '/aiops login endpoint returns 500 since yesterday, locate and fix',
     steps: {
       en: [
-        { phase: 'Diagnose', desc: 'Reads logs, traces the error to root cause' },
-        { phase: 'Implement', desc: 'Minimal fix + regression test (TDD)' },
-        { phase: 'Ship', desc: 'Shows diff with diagnosis notes, waits for approval' },
+        { phase: 'Diagnose', desc: 'Reproduces the failure and traces it to root cause' },
+        { phase: 'Implement', desc: 'Adds a regression test and keeps the fix narrow' },
+        { phase: 'Ship', desc: 'Shows diagnosis notes and waits for approval' },
       ],
       zh: [
-        { phase: '定位', desc: '读日志，追踪错误到根因' },
-        { phase: '实现', desc: '最小修复 + 回归测试（TDD）' },
-        { phase: '交付', desc: '展示 diff 和诊断笔记，等你确认' },
+        { phase: '定位', desc: '复现失败，并追踪到根因' },
+        { phase: '实现', desc: '补回归测试，并保持修复范围很小' },
+        { phase: '交付', desc: '展示诊断笔记，等待你确认' },
       ],
     },
     result: { en: 'Skips alignment — straight to diagnosis path', zh: '跳过对齐——直接走诊断路径' },
@@ -61,18 +61,18 @@ const scenarios = [
     prompt: '/aiops check my architecture for optimization opportunities',
     steps: {
       en: [
-        { phase: 'Graph', desc: 'graphify builds AST code graph + community detection' },
-        { phase: 'Scan', desc: '4 parallel agents scan from structure, data-flow, change, test angles' },
-        { phase: 'Report', desc: 'Generates HTML report with deepening opportunities' },
-        { phase: 'Pick', desc: 'You choose one opportunity to deepen' },
-        { phase: 'Implement', desc: 'Design → implement → test the refactor' },
+        { phase: 'Inspect', desc: 'Builds evidence from code structure and dependencies' },
+        { phase: 'Scan', desc: 'Looks for places where change is risky or design is shallow' },
+        { phase: 'Report', desc: 'Summarizes refactor opportunities with supporting facts' },
+        { phase: 'Pick', desc: 'You choose one opportunity to improve' },
+        { phase: 'Implement', desc: 'Designs, tests, and implements the chosen refactor' },
       ],
       zh: [
-        { phase: '图谱', desc: 'graphify 构建 AST 代码图谱 + 社区检测' },
-        { phase: '扫描', desc: '4 个并行 agent 从结构、数据流、变更、测试角度扫描' },
-        { phase: '报告', desc: '生成 HTML 报告，标注可深化的机会' },
-        { phase: '选择', desc: '你选择一个机会进行深化' },
-        { phase: '实现', desc: '设计 → 实现 → 测试重构' },
+        { phase: '检查', desc: '从代码结构和依赖关系收集证据' },
+        { phase: '扫描', desc: '寻找变更风险高或设计偏浅的位置' },
+        { phase: '报告', desc: '用事实支撑重构机会' },
+        { phase: '选择', desc: '你选择一个值得优化的点' },
+        { phase: '实现', desc: '设计、测试并实现选中的重构' },
       ],
     },
     result: { en: 'Data-driven refactoring, not opinion-driven', zh: '数据驱动重构，而非主观判断' },
@@ -109,8 +109,8 @@ export default function DemosPage() {
         </h1>
         <p className="text-muted-foreground text-base">
           {lang === 'zh'
-            ? '真实场景、真实数据。看看 aiops 在实际项目中做了什么。'
-            : 'Real scenarios, real data. See what aiops actually does in real projects.'}
+            ? '从输入到结果，看 aiops 如何处理真实任务。'
+            : 'From prompt to result, see how aiops handles real tasks.'}
         </p>
       </div>
 
@@ -141,8 +141,8 @@ export default function DemosPage() {
         </h2>
         <p className="text-sm text-muted-foreground mb-6">
           {lang === 'zh'
-            ? '每个场景展示：你输入什么 → Agent 做了什么 → 你得到什么。'
-            : 'Each scenario shows: what you type → what the agent does → what you get.'}
+            ? '每个场景展示：你输入什么 → 流程如何推进 → 最后得到什么。'
+            : 'Each scenario shows: what you type → how the flow moves → what you get.'}
         </p>
         <div className="space-y-6">
           {scenarios.map((s) => (
@@ -199,8 +199,8 @@ export default function DemosPage() {
         </h2>
         <p className="text-sm text-muted-foreground mb-4">
           {lang === 'zh'
-            ? '同一个项目、同一个任务——有无 aiops 全流程的差异。'
-            : 'Same project, same task — with vs without the full aiops flow.'}
+            ? '同一个项目、同一个任务，对比直接让 AI 写和经过 aiops 流程的差异。'
+            : 'Same project, same task: compare direct AI coding with the guided aiops flow.'}
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
           {[
@@ -243,7 +243,7 @@ export default function DemosPage() {
       <div>
         <div className="flex items-center gap-3 mb-2">
           <h2 className="text-xl font-semibold">
-            {lang === 'zh' ? '代码图谱增强 Agent 能力' : 'Code Graph enhances Agent capabilities'}
+            {lang === 'zh' ? '代码图谱让架构判断更有依据' : 'Code Graph gives architecture work better evidence'}
           </h2>
           <Badge variant="outline" className="font-mono text-[0.6rem] text-[var(--cyan)] border-[var(--cyan)]/30">
             graphify
@@ -251,8 +251,8 @@ export default function DemosPage() {
         </div>
         <p className="text-sm text-muted-foreground mb-5 max-w-2xl">
           {lang === 'zh'
-            ? 'graphify 为 AI Agent 提供结构化代码理解——AST 解析 + Louvain 社区检测。Agent 不再靠 grep 猜测，而是基于真实代码图谱做决策。'
-            : 'graphify provides structured code understanding for AI agents — AST parsing + Louvain community detection. Agents decide from real code graphs, not grep guesses.'}
+            ? 'graphify 是可选增强。它用 AST 解析和 Louvain 社区检测生成代码图谱，让架构扫描基于结构证据，而不是只靠文本搜索。'
+            : 'graphify is optional. It builds a code graph with AST parsing and Louvain community detection, so architecture scans can use structural evidence instead of text search alone.'}
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {codeGraphCapabilities.map((cap) => (

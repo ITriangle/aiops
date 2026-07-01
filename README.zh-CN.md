@@ -2,54 +2,24 @@
 
 [English](README.md)
 
-面向 AI 辅助软件开发的 agent skills bundle —— 一条 `/aiops` 命令带你对齐、实现、交付，全程硬质量门控。安装一次，跨 **6 个 AI IDE** 使用。
+在 AI IDE 里输入 `/aiops`，用自然语言描述你想做的工作。aiops 会带你从澄清需求走到实现、评审和最终确认，并支持跨 **6 个 AI IDE** 恢复进度。
 
-入口：`**/aiops**`（Flow Conductor — 中文步骤引导，进度可恢复）
+入口：`**/aiops**`（引导式工作流，进度通过 `flow.state.yaml` 恢复）
 
-## 核心特性
+## 它帮你解决什么
 
-- **一条命令开工** — 用中文描述目标即可；进度写在 `.scratch/<功能名>/flow.state.yaml`，`/aiops 继续` 接着做
-- **23 个 skills** — 对齐 → 设计评审 → 规划 → 交付 → 评审 → 发布 + 代码图谱基础设施
-- **9 个专业 agents** — 制品契约与调度序列（普通用户不必记名字）
-- **代码图谱** — graphify 确定性提取（Tree-sitter AST + Louvain 社区检测）+ AI 语义标注，为所有 skill 提供结构化代码理解
-- **零配置默认** — 无 `aiops.yaml` 时用本地 markdown 记任务；团队可配置 GitHub/GitLab
-- **始终生效的 lean 纪律** — YAGNI ladder 自动注入编码 turn（Cursor / Copilot / Windsurf rules）
-- **多 IDE 可移植** — `SKILL.md` 单一来源，adapter 编译为各 IDE 原生格式
+- **从任务开始** — 用自然语言描述功能、Bug 或重构
+- **跟着流程推进** — aiops 补齐关键决策，显示当前步骤，并自动保存进度
+- **限制 AI 乱写** — lean、TDD、prune、review 在交付前逐步检查
+- **随时继续** — 进度写在 `.scratch/<功能名>/flow.state.yaml`，`/aiops 继续` 接着做
+- **你保持控制权** — 只有你明确确认后才 commit
+- **需要时再深入** — agent、skill、代码图谱支持更大的团队流程和架构任务
 
 ## 快速开始
 
 ```bash
-# 安装到所有检测到的 AI IDE（项目级，默认）
 npx -y github:yugasun/aiops
-
-# 或通过 curl
-curl -fsSL https://raw.githubusercontent.com/yugasun/aiops/main/install.sh | bash
 ```
-
-### 代码图谱（可选增强）
-
-aiops 的 23 个 skill 中，`/code-graph` 是可选的代码图谱能力——基于 [graphify](https://github.com/safishamsi/graphify)（Tree-sitter AST 解析 + Louvain 社区检测）构建结构化代码理解。其他 22 个 skill **不需要安装任何额外依赖**。
-
-**什么时候需要？** 当你想用 `/aiops 帮我看看架构有哪些可以优化` 时，代码图谱会提供更精确的分析。不用也能跑，只是精度稍低。
-
-**安装步骤：**
-
-```bash
-# 第一步：安装 Python 包管理器 uv（如果已有 uv 或 pip，跳过这步）
-# macOS / Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
-# Windows
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-
-# 第二步：安装 graphify（PyPI 包名 graphifyy，CLI 命令 graphify）
-uv tool install graphifyy
-
-# 第三步：验证
-graphify --version
-```
-
-> **不想装 uv？** 也可以用 pip：`pip install graphifyy`，或 pipx：`pipx install graphifyy`。
-> **不想装 graphify？** 完全没问题。aiops 的对齐、设计、实现、质量门等核心功能全部独立可用。
 
 在目标项目聊天框输入：
 
@@ -62,6 +32,32 @@ graphify --version
 ```
 /aiops 继续
 ```
+
+## 接下来会发生什么
+
+对于一个小功能，aiops 通常会：
+
+1. 澄清范围和验收标准
+2. 在编码前确认设计
+3. 先写测试
+4. 实现最小可用改动
+5. 清理多余代码并评审 diff
+6. 等你确认后再提交
+
+Bug 会跳过不必要的对齐仪式，直接进入诊断。较大的功能可以先整理成 PRD，再拆成垂直切片逐个实现。
+
+### 代码图谱（可选增强）
+
+架构扫描可以使用 `/code-graph` 获取更结构化的代码理解。它基于 [graphify](https://github.com/safishamsi/graphify)，使用 Tree-sitter AST 解析和 Louvain 社区检测。这个能力是可选的；aiops 的核心流程不依赖 Python 工具。
+
+只有当你需要更强的架构分析和影响分析时再安装：
+
+```bash
+uv tool install graphifyy
+graphify --version
+```
+
+不用 uv 也可以：`pip install graphifyy` 或 `pipx install graphifyy`。
 
 ### CLI 选项
 
@@ -109,9 +105,11 @@ npx -y github:yugasun/aiops --uninstall
 | **通用 harness**     | —                   | `AGENTS.md`（项目根目录）                | —                       | —                            |
 
 
-## 功能清单
+## 背后的能力
 
-### Skills（23 个 Tier 1）
+日常使用不需要记住这些名字。它们主要用于团队检查、定制或直接调用具体能力。
+
+### Skills
 
 
 | 层      | Skills                                                                |
@@ -144,9 +142,9 @@ npx -y github:yugasun/aiops --uninstall
 | `gitops`          | Git 操作      | commit + push            |
 
 
-### Lean 纪律（始终生效）
+### 交付纪律
 
-YAGNI ladder 在支持的 IDE 中自动注入每次编码 turn：
+编码前先过 lean ladder：
 
 ```
 1. 这真的需要存在吗？(YAGNI)
@@ -157,13 +155,14 @@ YAGNI ladder 在支持的 IDE 中自动注入每次编码 turn：
 6. 能工作的最少代码
 ```
 
-交付序列：**lean → TDD → prune → review → commit**（仅在用户明确要求后提交）。
+交付序列：**lean → TDD → prune → review → commit**。最后的 commit 只有在你明确确认后才执行。
 
 ## 在目标项目中使用
 
-1. 打开项目，直接 `/aiops …` — 首次会自动静默配置（本地 markdown issue + 默认标签）
-2. 团队用 GitHub/GitLab 时，在项目根添加 `aiops.yaml`（见 `skills/aiops-setup/aiops.yaml.example`）
-3. 大任务默认单次会话；多模块时可拆 PRD + 多个 issue
+1. 在 AI IDE 中打开项目，运行 `/aiops <任务>`
+2. 跟着提示推进；aiops 会自动保存进度
+3. 回来时输入 `/aiops 继续`
+4. 只有团队需要 GitHub/GitLab issue 跟踪时，才添加 `aiops.yaml`
 
 详情：[**docs/getting-started.md**](docs/getting-started.md)
 
@@ -198,9 +197,9 @@ node scripts/build/build-all.js    # 维护者：生成所有 IDE 原生制品
 
 > 真实运行记录，基于 [aiops-demo](https://github.com/yugasun/aiops-demo) 项目。[完整目录 →](docs/demos/)
 
-- [Health Check 完整走查](docs/demos/health-check-walkthrough.md) — TDD + prune + review 全流程，+32 行，4 tests pass
-- [架构扫描 + 代码图谱](docs/demos/architecture-scan-walkthrough.md) — graphify 图谱 → 4 视角扫描 → 拆分 God module
-- [效果对比分析](docs/demos/effect-analysis.md) — 两个实验：加功能（-52% 代码量）+ 修 Bug（TDD 消除静默 bug）
+- [Health Check 完整走查](docs/demos/health-check-walkthrough.md) — 一个小 API 功能如何经过澄清、TDD、评审和确认
+- [架构扫描 + 代码图谱](docs/demos/architecture-scan-walkthrough.md) — 先用证据扫描架构，再选择一个重构点
+- [效果对比分析](docs/demos/effect-analysis.md) — 对比直接让 AI 写和经过 aiops 流程后的交付差异
 - [自动化 Benchmark](docs/demos/benchmark.sh) — `bash docs/demos/benchmark.sh` 一键运行对比实验
 
 ## 许可证
