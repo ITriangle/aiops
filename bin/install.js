@@ -253,6 +253,17 @@ function installAgentsMd(provider, isGlobal) {
   }
 
   fs.mkdirSync(path.dirname(destPath), { recursive: true });
+  if (fs.existsSync(destPath)) {
+    const srcContent = fs.readFileSync(agentsMdPath, "utf8");
+    const destContent = fs.readFileSync(destPath, "utf8");
+    if (srcContent === destContent) {
+      ok(`AGENTS.md already up to date → ${c.dim(path.dirname(destPath))}`);
+    } else {
+      skip(`AGENTS.md exists; left unchanged at ${destPath}`);
+    }
+    return;
+  }
+
   fs.copyFileSync(agentsMdPath, destPath);
   ok(`AGENTS.md → ${c.dim(path.dirname(destPath))}`);
 }
