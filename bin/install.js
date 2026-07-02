@@ -228,46 +228,6 @@ function uninstallAgents(provider, agents, isGlobal) {
   }
 }
 
-/**
- * Install AGENTS.md for providers that use it instead of standalone agent files
- * (e.g. Codex CLI reads AGENTS.md from project root or ~/.codex/AGENTS.md).
- */
-function installAgentsMd(provider, isGlobal) {
-  const agentsMdPath = path.join(AIOps_ROOT, "AGENTS.md");
-  if (!fs.existsSync(agentsMdPath)) {
-    skip("no AGENTS.md found (run: node scripts/build/build-agents-md.js)");
-    return;
-  }
-
-  let destPath;
-  if (isGlobal) {
-    // Global: write to provider's config directory
-    if (provider.id === "codex") {
-      destPath = path.join(HOME, ".codex", "AGENTS.md");
-    } else {
-      return; // No global AGENTS.md convention for other providers
-    }
-  } else {
-    // Local: write to project root
-    destPath = path.resolve("AGENTS.md");
-  }
-
-  fs.mkdirSync(path.dirname(destPath), { recursive: true });
-  if (fs.existsSync(destPath)) {
-    const srcContent = fs.readFileSync(agentsMdPath, "utf8");
-    const destContent = fs.readFileSync(destPath, "utf8");
-    if (srcContent === destContent) {
-      ok(`AGENTS.md already up to date → ${c.dim(path.dirname(destPath))}`);
-    } else {
-      skip(`AGENTS.md exists; left unchanged at ${destPath}`);
-    }
-    return;
-  }
-
-  fs.copyFileSync(agentsMdPath, destPath);
-  ok(`AGENTS.md → ${c.dim(path.dirname(destPath))}`);
-}
-
 function installSkills(provider, isGlobal) {
   const skillsDir = path.join(AIOps_ROOT, "skills");
   if (!hasDir(skillsDir)) {
@@ -436,8 +396,6 @@ function main() {
         installAgents(provider, agents, args.global);
         totalInstalled += agents.length;
       }
-      // Also install AGENTS.md as a supplement (protocol file for generic harnesses)
-      installAgentsMd(provider, args.global);
     }
 
     log("");
