@@ -10,8 +10,10 @@
   },
   "license": "Apache-2.0",
   "files": [
+    "AGENTS.md",
     "bin/",
     "agents/",
+    "scripts/",
     "skills/",
     "docs/"
   ]
